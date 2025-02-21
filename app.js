@@ -4,12 +4,12 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const gameFunderDB = require ('./models/connection')
+const pjbgDB = require ('./models/connection')
 
 
 dotenv.config();
 const app = express();
-gameFunderDB();
+pjbgDB();
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
