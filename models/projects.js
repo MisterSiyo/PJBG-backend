@@ -1,0 +1,138 @@
+const mongoose = require('mongoose');
+
+// les quatres sous documents que constituent chaque document 
+// de la collection Projects :
+//  (detail, history, progression, stage)
+
+// détaille le projet avec la description, les mécaniques de jeu et les pledges
+const detailSchema = mongoose.Schema({
+    description: {
+        type: String,
+        required: [true, 'a description is required for your project']
+    },
+    gameMecanics: [{type: mongoose.Schema.Types.ObjectId, ref: 'gameMecanics'}],
+    pledges: [{type: mongoose.Schema.Types.ObjectId, ref: 'pledges'}]
+   });
+
+// !!! attention, ci-dessous il faudra peut être passer en mode Pusher ?!
+// gère le 'chat/forum' entre backers et un feed news (automatisé par script, posté par le compte du staff)
+const historySchema = mongoose.Schema({
+    historyType: String,
+    message: String,
+    date: Date,
+    userPosting: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
+   });
+
+// gère les subscriptions au fur et à mesure
+const progressionSchema = mongoose.Schema({
+   contributionId: Number,
+   userContributing: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
+   pledgeChosen: String, // !!! à corriger, il faut voir comment faire car je m'y perd un peu là
+    pledgePayed: Boolean,
+   });
+
+// gère l'historique du développement du projet
+const stageSchema = mongoose.Schema({
+    stageId: Number,
+    title: {
+        type: String,
+        required: [true, 'a title is required for your update']
+    },
+    content: {
+        type: String,
+        required: [true, 'a content is required for your update']
+    },
+    imagesURL: [{
+        type: String,
+        default: '', // !!! définir une image bidon en default
+        validator : function(d) {
+            return  /http\:\/\/.+/.test(d);
+        },
+        message: props => `${props.value} n'est pas une URL valide`
+    }],
+   },
+   { timestamps: true }
+);
+
+// la collection ci-dessous
+
+const projectSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: [true, 'a name is required for your project']
+        },
+        imageURL: {
+            type: String,
+            default: '', // !!! définir une image bidon en default
+            validator : function(d) {
+                return  /http\:\/\/.+/.test(d);
+            },
+            message: props => `${props.value} n'est pas une URL valide`
+        },
+        pitch: {
+            type: String,
+            required: [true, 'a pitch is required for your project']
+        },
+
+        // nested documents ci-dessous 
+        detail: detailSchema,
+        histories: [historySchema],
+        progressions: [progressionSchema],
+        stages: [stageSchema],
+
+
+        goal: {
+            type: Number,
+            default: 123456789, // !!! a voir ensemble si on en met une, et laquelle
+            required: false, // !!! a voir ensemble
+        },
+
+        // Booléens de typage pour le front (affichage, fonctionnalités possibles...)
+
+        isVisible: {
+            type: Boolean,
+            default: false,
+        },
+        isChosen: {
+            type: Boolean,
+            default: false,
+        },
+        isValidatedByStaff: {
+            type: Boolean,
+            default: false,
+        },
+
+        // 3 Dates importantes (création gérée par le timeStamp Mongoose) :
+
+        // Publication : après validation du staff suite à la création par un user (date d'apparition dans le "catalogue")
+        dateOfPublication: {
+            type: Date,
+            required: false,
+            default: null
+        },
+
+        // Choix par le premier (ou seul) studio : lance le timer de compétition
+        dateOfChoosing: {
+            type: Date,
+            required: false,
+            default: null
+        },
+
+        // Validation (deuxieme et plus importante) par le staff du studio en charge du projet : lance le mode développement
+        dateOfValidation: {
+            type: Date,
+            required: false,
+            default: null
+        },
+
+        // la liste de tous les studios ayant souhaité prendre en main le projet
+        studiosPreVote: [{type: mongoose.Schema.Types.ObjectId, ref: 'studios'}],
+        studioValidated: {type: mongoose.Schema.Types.ObjectId, ref: 'studios'}
+    },
+    { timestamps: true }
+);
+
+const Project = mongoose.model('Project', projectSchema);
+
+module.exports = Project;

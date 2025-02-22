@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema(
             required: true,
             unique: true,
             match: [/.+@.+\..+/, 'Veuillez entrer une adresse e-mail valide'], //marche pas ?
+            //je me permets, à la place de match >>>  
+            // validator : function(d) {
+            // return  /.+@.+\..+/.test(d)},
+            //message: props => `${props.value} n'est pas une adresse e-mail valide`
         },
         password: {
             type: String,
