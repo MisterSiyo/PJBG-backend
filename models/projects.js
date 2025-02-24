@@ -11,7 +11,7 @@ const detailSchema = mongoose.Schema({
         required: [true, 'a description is required for your project']
     },
     gameMecanics: [{type: mongoose.Schema.Types.ObjectId, ref: 'gameMecanics'}],
-    pledges: [{type: mongoose.Schema.Types.ObjectId, ref: 'pledges'}]
+    pledges: [{type: mongoose.Schema.Types.ObjectId, ref: 'pledges'}],
    });
 
 // !!! attention, ci-dessous il faudra peut être passer en mode Pusher ?!
@@ -28,7 +28,7 @@ const progressionSchema = mongoose.Schema({
    contributionId: Number,
    userContributing: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
    pledgeChosen: String, // !!! à corriger, il faut voir comment faire car je m'y perd un peu là
-    pledgePayed: Boolean,
+    isPledgePayed: Boolean,
    });
 
 // gère l'historique du développement du projet
@@ -57,8 +57,9 @@ const stageSchema = mongoose.Schema({
 // la collection ci-dessous
 
 const projectSchema = new mongoose.Schema(
-    {
-        name: {
+    {   
+        projectId: Number,
+        title: {
             type: String,
             required: [true, 'a name is required for your project']
         },
@@ -128,7 +129,10 @@ const projectSchema = new mongoose.Schema(
 
         // la liste de tous les studios ayant souhaité prendre en main le projet
         studiosPreVote: [{type: mongoose.Schema.Types.ObjectId, ref: 'studios'}],
-        studioValidated: {type: mongoose.Schema.Types.ObjectId, ref: 'studios'}
+        studioValidated: {type: mongoose.Schema.Types.ObjectId, ref: 'studios'},
+
+        // le user ayant créé le projet
+        userId: {type: mongoose.Schema.Types.ObjectId, ref: 'users'}
     },
     { timestamps: true }
 );
