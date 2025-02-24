@@ -1,10 +1,10 @@
+const dotenv = require('dotenv');
+const pjbgDB = require ('./models/connection')
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
-const dotenv = require('dotenv');
-const pjbgDB = require ('./models/connection')
 
 
 dotenv.config();
