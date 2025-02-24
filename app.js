@@ -1,4 +1,4 @@
-const dotenv = require('dotenv');
+require('dotenv').config();
 const pjbgDB = require ('./models/connection')
 const express = require('express');
 const path = require('path');
@@ -7,7 +7,6 @@ const logger = require('morgan');
 const cors = require('cors');
 
 
-dotenv.config();
 const app = express();
 pjbgDB();
 
@@ -29,5 +28,5 @@ app.use(cors(corsOptions));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
+ 
 module.exports = app;
