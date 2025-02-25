@@ -60,7 +60,7 @@ router.post('/backing', (req, res) => {
     Project.find({projectId}).then(data => {
         nextId = data.progressions.length +1;
     })
-
+    
     Project.updateOne({projectId}, {progressions: {
         contributionId: nextId,
         userContributing,
