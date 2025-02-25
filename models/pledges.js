@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+// changer, faire un seul id pledge par niveaucontrib et par choix !!!!
 const rewardSchema = mongoose.Schema({
     rewardId: String,
     rewards: [String],

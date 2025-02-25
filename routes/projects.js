@@ -3,71 +3,65 @@ var router = express.Router();
 const Project = require('../models/projects');
 
 // route qui envoie le catalogue complet au front-end 
-router.get('/', (req, res) => { // !!!! attention, je n'ai pas filtré par catégories de user, donc à voir ou on fait ça, front ou back
-
-    Project.find('').then(projectsData => {
+router.get('/', async res => { // !!!! attention, je n'ai pas filtré par catégories de user, donc à voir ou on fait ça, front ou back
+    try {
+        const projectsData = await Project.find('');
         if (projectsData) {
             res.json({result: true, message: 'here are your results', projectsData});
-        } else {
-            res.json({result: false, error: 'No data to show'})
         }
-    })
+    } catch (error) {
+        res.status(403).json({message: 'no data to show', error});
+    }
 });
 
 // route qui permet de créer un projet en base de données
-router.post('/', (req, res) => {
-
-    const {userId, title, pitch, description, goal, gameMechanics, pledges } = req.body // !!! pledges à réfléchir ou changer
-    let nextId = null;
-    Project.find('').then(data => { // chercher le nombre de projets déjà créés pour assigner le bon id au suivant
-        nextId = data.length +1;
-    }).then(e => {
-
-    const newProject = new Project({
-        projectId: nextId,
-        title,
-        imageURL: '', // lien vers la photo du profil du créateur
-        pitch,
-        detail: {
-            description,
-            gameMechanics,
-            pledges,
-        },
-        histories: [{
-            historyType: '', // vide à la créa
-            message: '', // vide à la créa
-            date: new Date, // vide à la créa
-            userPosting: '' // vide à la créa
-        }],
-        progressions: [{
-            contributionId: '', // vide à la créa
-            userContributing: '', // vide à la créa
-            pledgeChosen: '', // vide à la créa
-            isPledgePayed: '', // vide à la créa
-        }],
-        stages: [{
-            stageId: '', // vide à la créa
-            title: '', // vide à la créa
-            content: '', // vide à la créa
-            imagesURL: '', // vide à la créa
-        }],
-        goal,
-        studiosPreVote: [''], // vide à la créa
-        studioValidated: '', // vide à la cré
-        userId,
-    });
-    newProject.save();
-
-    Project.find({projectId}).then(data => {
-        if (data) {
-            res.json({result: true, message: 'project created with success', data})
-        } else {
-            res.json({result: false, error: 'Oops, something went wrong'})
-        }
-    })
-})
+router.post('/', async (req, res) => { 
+    try {
+        const {userId, title, pitch, description, goal, gameMechanics, pledges } = req.body; // !!! pledges à réfléchir ou changer
+        const nextId = (await Project.find('')).length +1; // chercher le nombre de projets déjà créés pour assigner le bon id au suivant
+        const newProject = new Project({
+            projectId: nextId,
+            title,
+            imageURL: '', // lien vers la photo du profil du créateur
+            pitch,
+            detail: {
+                description,
+                gameMechanics,
+                pledges,
+            },
+            histories: [{
+                historyType: '', // vide à la créa
+                message: '', // vide à la créa
+                date: new Date, // vide à la créa
+                userPosting: '' // vide à la créa
+            }],
+            progressions: [{
+                contributionId: '', // vide à la créa
+                userContributing: '', // vide à la créa
+                pledgeChosen: '', // vide à la créa
+                isPledgePayed: '', // vide à la créa
+            }],
+            stages: [{
+                stageId: '', // vide à la créa
+                title: '', // vide à la créa
+                content: '', // vide à la créa
+                imagesURL: '', // vide à la créa
+            }],
+            goal,
+            studiosPreVote: [''], // vide à la créa
+            studioValidated: '', // vide à la cré
+            userId,
+        });
+        await newProject.save();
+    
+        const newCreatedProject = await Project.find({projectId: nextId});
+        res.json({result: true, message: 'project created with success', data})
+    } catch (error) {
+        res.json({result: false, error: 'Oops, something went wrong'})
+    }
 });
 
+// route qui permet à un user de contribuer financièrement à un projet
 router.post('/backing', (req, res) => {
 
     const {projectId, userContributing, pledgeChosen} = req.body;
