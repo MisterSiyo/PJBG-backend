@@ -65,6 +65,7 @@ const projectSchema = new mongoose.Schema(
         },
         imageURL: {
             type: String,
+            required: false,
             default: '', // !!! définir une image bidon en default
             validator : function(d) {
                 return  /http\:\/\/.+/.test(d);

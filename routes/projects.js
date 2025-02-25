@@ -29,33 +29,23 @@ router.post('/', async (req, res) => {
                 gameMechanics,
                 pledges,
             },
-            histories: [{
-                historyType: '', // vide à la créa
-                message: '', // vide à la créa
-                date: new Date, // vide à la créa
-                userPosting: '' // vide à la créa
-            }],
-            progressions: [{
-                contributionId: '', // vide à la créa
-                userContributing: '', // vide à la créa
-                pledgeChosen: '', // vide à la créa
-                isPledgePayed: '', // vide à la créa
-            }],
+            histories: [],
+            progressions: [],
             stages: [{
-                stageId: '', // vide à la créa
-                title: '', // vide à la créa
-                content: '', // vide à la créa
+                stageId: 1, // premier stage, initalisant le projet en mode dev, affiché que lorsque les triggers sont déclenchés
+                title: 'Welcome !', 
+                content: 'Congratulations on your project !', 
                 imagesURL: '', // vide à la créa
             }],
             goal,
             studiosPreVote: [''], // vide à la créa
-            studioValidated: '', // vide à la cré
+            studioValidated: '', // vide à la créa
             userId,
         });
         await newProject.save();
     
         const newCreatedProject = await Project.find({projectId: nextId});
-        res.json({result: true, message: 'project created with success', data})
+        res.json({result: true, message: 'project created with success', newCreatedProject})
     } catch (error) {
         res.json({result: false, error: 'Oops, something went wrong'})
     }
@@ -68,7 +58,7 @@ router.post('/backing', (req, res) => {
     let nextId = null;
     let isPledgePayed = true; // c'est ici (à la place de mon forcing de true) qu'il faudra faire un appel API à la banque pour vérifier leur OK
     Project.find({projectId}).then(data => {
-        nextId = data.length +1;
+        nextId = data.progressions.length +1;
     })
 
     Project.updateOne({projectId}, {progressions: {
