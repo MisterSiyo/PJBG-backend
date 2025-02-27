@@ -3,16 +3,31 @@ var router = express.Router();
 const Project = require('../models/projects');
 
 // route qui envoie le catalogue complet au front-end 
-router.get('/', async res => { // !!!! attention, je n'ai pas filtré par catégories de user, donc à voir ou on fait ça, front ou back
+router.get('/all', async res => { // !!!! attention, je n'ai pas filtré par catégories de user, donc à voir ou on fait ça, front ou back
     try {
         const projectsData = await Project.find('');
         if (projectsData) {
             res.json({result: true, message: 'here are your results', projectsData});
         }
     } catch (error) {
-        res.status(403).json({message: 'no data to show', error});
+        res.status(403).json({result: false, message: 'no data to show', error});
     }
 });
+
+// route qui permet de donner les data d'un seul projet pour afficher la page d'un projet
+router.get(`/:projectName`, async (req, res) => {
+    try {
+
+        const title = req.params.projectName;
+
+        const project = await Project.find({title});
+        if (project) {
+            res.json({result: true, messsage: 'here is your project page', project})
+        }
+    } catch (error) {
+        res.status(403).json({result: false, message: 'no project of this name', error})
+    }
+})
 
 // route qui permet de créer un projet en base de données
 router.post('/', async (req, res) => { 
@@ -47,7 +62,7 @@ router.post('/', async (req, res) => {
         const newCreatedProject = await Project.find({projectId: nextId});
         res.json({result: true, message: 'project created with success', newCreatedProject})
     } catch (error) {
-        res.json({result: false, error: 'Oops, something went wrong'})
+        res.json({result: false, message: 'Oops, something went wrong', error})
     }
 });
 
@@ -78,6 +93,33 @@ router.post('/backing', (req, res) => {
     })
 });
 
+// route qui permet de poster un message dans le chat du projet
+
+router.post('/message', async (req, res) => {
+
+    try {
+
+        const {projectId, userPosting, message} = req.body;
+
+        const updateMessage = await Project.updateOne({projectId}, 
+            {$push: {
+                histories: {
+                    historyType: "chatMessage", 
+                    message, 
+                    date: new Date(), 
+                    userPosting
+                    }
+                }
+            }
+        )
+        if (updateMessage) {
+            res.json({result: true, message: 'here is your message', updateMessage});
+        }
+
+    } catch (error) {
+        res.status(403).json({result: false, message: 'cant touch this', error})
+    }
+})
 
 
 
