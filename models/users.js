@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 
+const adressShema = new mongoose.Schema(
+    { 
+        street: { type: String, required: true }, 
+        postalCode: { type: String, required: true }, 
+        city: { type: String, required: true }, 
+        country: { type: String, required: true } 
+    },
+)
+
 const userSchema = new mongoose.Schema(
     {
         username: {
@@ -12,11 +21,6 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
-            match: [/.+@.+\..+/, 'Veuillez entrer une adresse e-mail valide'], //marche pas ?
-            //je me permets, à la place de match >>>  
-            // validator : function(d) {
-            // return  /.+@.+\..+/.test(d)},
-            //message: props => `${props.value} n'est pas une adresse e-mail valide`
         },
         password: {
             type: String,
@@ -27,7 +31,40 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-    },
+        role: { 
+            type: String, 
+            enum: ['user', 'studio'], // Se renseigne automatiquement en focntion de la création de compte
+            required: true,
+        },
+        socialLinks: [
+            {
+            platform: { 
+                type: String, 
+                enum: ['Facebook', 'Twitter', 'Instagram', 'LinkedIn', 'YouTube', 'GitHub'], // Prédéfinis pour éviter les fautes
+            },
+                url: { type: String}
+            }
+        ],
+         address: [
+            adressShema
+         ],
+         fundedProjects: [ // Liste des projets financés par l'utilisateur
+            {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'Project'
+            }
+        ],
+        followedProjects: [ // Liste des projets que l'utilisateur suit (mais n'a pas forcément financé)
+            {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'Project'
+            }
+        ],
+        createdProjects: [ // Liste des projets créés par l'utilisateur (il a financé et créé)
+        {type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Project'}
+        ],
+},
     { timestamps: true }
 );
 
