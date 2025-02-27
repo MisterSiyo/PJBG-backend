@@ -8,7 +8,7 @@ const User = require('../models/users');
 
 // Route pour la création d'un compte utilisateur
 router.post('/register', async (req, res) => {
-    const { username, email, password, role, socialLinks, address } = req.body;
+    const { username, email, password, role, socialLinks } = req.body;
 
     if (role !== 'user' && role !== 'studio') { // Vérifie que le rôle est bien intégré
         return res.status(400).send('Le rôle doit être "user" ou "studio"');
@@ -45,7 +45,12 @@ router.post('/register', async (req, res) => {
             password: hashedPassword,
             token,
             role,
-            address,
+            address:{
+                street: "135 rue Exemple", 
+                postalCode: "75015", 
+                city: "Paris",
+                country: "France"
+                },
             socialLinks: socialLinks || {}, 
         });
 

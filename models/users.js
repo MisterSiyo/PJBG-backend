@@ -1,12 +1,22 @@
 const mongoose = require('mongoose');
 
-const adressShema = new mongoose.Schema(
+const adressSchema = new mongoose.Schema(
     { 
         street: { type: String, required: true }, 
         postalCode: { type: String, required: true }, 
         city: { type: String, required: true }, 
         country: { type: String, required: true } 
     },
+)
+
+const socialLinksSchema = new mongoose.Schema(
+        {
+            platform: { 
+                type: String, 
+                enum: ['Facebook', 'Twitter', 'Instagram', 'LinkedIn', 'YouTube', 'GitHub'], // Prédéfinis pour éviter les fautes
+            },
+                url: { type: String}
+            }
 )
 
 const userSchema = new mongoose.Schema(
@@ -37,16 +47,10 @@ const userSchema = new mongoose.Schema(
             required: true,
         },
         socialLinks: [
-            {
-            platform: { 
-                type: String, 
-                enum: ['Facebook', 'Twitter', 'Instagram', 'LinkedIn', 'YouTube', 'GitHub'], // Prédéfinis pour éviter les fautes
-            },
-                url: { type: String}
-            }
+            socialLinksSchema
         ],
          address: [
-            adressShema
+            adressSchema
          ],
          fundedProjects: [ // Liste des projets financés par l'utilisateur
             {
