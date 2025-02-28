@@ -51,23 +51,23 @@ const userSchema = new mongoose.Schema(
          fundedProjects: [ // Liste des projets financés par l'utilisateur
             {
             type: mongoose.Schema.Types.ObjectId, 
-            ref: 'Project'
+            ref: 'projects'
             }
         ],
         followedProjects: [ // Liste des projets que l'utilisateur suit (mais n'a pas forcément financé)
             {
             type: mongoose.Schema.Types.ObjectId, 
-            ref: 'Project'
+            ref: 'projects'
             }
         ],
         createdProjects: [ // Liste des projets créés par l'utilisateur (il a financé et créé)
         {type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Project'}
+        ref: 'projects'}
         ],
 },
     { timestamps: true }
 );
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('users', userSchema);
 
 module.exports = User;

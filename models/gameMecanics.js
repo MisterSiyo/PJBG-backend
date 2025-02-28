@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
-const gameMecanicSchema = new mongoose.Schema(
+const gameMechanicSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: [true, 'name of mecanic required'],
+            required: [true, 'name of mechanic required'],
             trim: true,
         },
         imageURL: {
@@ -23,6 +23,6 @@ const gameMecanicSchema = new mongoose.Schema(
     }
 );
 
-const GameMecanic = mongoose.model('GameMecanic', gameMecanicSchema);
+const GameMechanic = mongoose.model('gameMechanics', gameMechanicSchema);
 
-module.exports = GameMecanic;
+module.exports = GameMechanic;

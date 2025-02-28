@@ -138,6 +138,6 @@ const projectSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-const Project = mongoose.model('Project', projectSchema);
+const Project = mongoose.model('projects', projectSchema);
 
 module.exports = Project;
