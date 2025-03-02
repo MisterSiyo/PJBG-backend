@@ -20,13 +20,13 @@ const historySchema = mongoose.Schema({
     historyType: String,
     message: String,
     date: Date,
-    userPosting: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
+    userPosting: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
    });
 
 // gère les subscriptions au fur et à mesure
 const progressionSchema = mongoose.Schema({
    contributionId: Number,
-   userContributing: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
+   userContributing: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
    pledgeChosen: String, // !!! à corriger, il faut voir comment faire car je m'y perd un peu là
     isPledgePayed: Boolean,
    });
@@ -133,7 +133,7 @@ const projectSchema = new mongoose.Schema(
         studioValidated: {type: mongoose.Schema.Types.ObjectId, ref: 'studios'},
 
         // le user ayant créé le projet
-        userId: {type: mongoose.Schema.Types.ObjectId, ref: 'users'}
+        user: {type: mongoose.Schema.Types.ObjectId, ref: 'users'}
     },
     { timestamps: true }
 );

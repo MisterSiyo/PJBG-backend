@@ -10,8 +10,8 @@ const User = require('../models/users');
 router.post('/register', async (req, res) => {
     const { username, email, password, role, socialLinks } = req.body;
 
-    if (role !== 'user' && role !== 'studio') { // Vérifie que le rôle est bien intégré
-        return res.status(400).send('Le rôle doit être "user" ou "studio"');
+    if (role !== 'patron' && role !== 'studio') { // Vérifie que le rôle est bien intégré
+        return res.status(400).send('Le rôle doit être "patron" ou "studio"');
     }
 
     try {

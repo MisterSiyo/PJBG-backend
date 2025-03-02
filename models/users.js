@@ -137,7 +137,7 @@ const userSchema  = new mongoose.Schema(
         },
         role: { 
             type: String, 
-            enum: ['backers', 'studio'], // Se renseigne automatiquement en focntion de la création de compte
+            enum: ['patron', 'studio'], // Se renseigne automatiquement en focntion de la création de compte
             required: true,
         },
         socialLinks: [
@@ -145,12 +145,12 @@ const userSchema  = new mongoose.Schema(
         ],
         name: {
             type: String,
-            required: true,
+            required: false,
             unique: true,
         },
         surname: {
             type: String,
-            required: true,
+            required: false,
             unique: true,
         },
         address: [
@@ -158,7 +158,7 @@ const userSchema  = new mongoose.Schema(
          ],
         phone: {
             type: String,
-            required: true,
+            required: false,
             unique: true,
         },
         preferences: // Genre de jeux préférés
@@ -206,6 +206,6 @@ userSchema.pre('save', function (next) {
     next();
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('users', userSchema);
 
-module.exports = { User};
+module.exports = User;
