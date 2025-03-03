@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
         const {token, title, pitch, description, goal} = req.body; // !!! gameMechanics et pledges à rajouter
         const user = await User.findOne({token});
         if (!user) {
-            return res.status(404).json({result: false, error: 'user not found'})
+            return res.status(404).json({result: false, error: 'cant touch this'})
         }
         const spaces = / /g
         const pageURL = title.trim().replace(spaces, '-')
@@ -58,7 +58,7 @@ router.post('/', async (req, res) => {
             user : user._id,
         });
         await newProject.save();
-        const newCreatedProject = await Project.find({title: title.trim()}).populate('user').populate('histories.userPosting')
+        const newCreatedProject = await Project.findOne({title: title.trim()}).populate('user').populate('histories.userPosting')
         res.json({result: true, message: 'project created with success', newCreatedProject})
     } catch (error) {
         res.json({result: false, message: 'Oops, something went wrong', error})
