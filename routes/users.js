@@ -66,22 +66,34 @@ router.post('/register', async (req, res) => {
 // Route pour la connexion d'un utilisateur
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, username, password } = req.body;
 
-        if (!email || !password) {  // Vérifie si tous les champs sont remplis
-            return res.status(400).json({ error: 'Champ.s manquant.s' });
+        // Vérifie que l'utilisateur a bien rempli au moins l'email OU le username et le mot de passe
+        if ((!email && !username) || !password) {
+            return res.status(400).json({ message: "Champ manquant : email/username ou password" });
         }
 
-        const user = await User.findOne({ email });  // Vérifie si l'email est reconnu
-        if (!user) { 
-            return res.status(400).json({ message: 'Email non reconnu' });
+        let user;
+
+        // Recherche dans le BDD de l'utilisateur soit par email, soit par username
+        if (email) {
+            user = await User.findOne({ email });
+        } else if (username) {
+            user = await User.findOne({ username });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password); // Vérifie si le MDP est reconnu
+        // Si aucun utilisateur n'est trouvé, renvoie une erreur en fonction de l'identifiant utilisé
+        if (!user) {
+            return res.status(400).json({ message: "Utilisateur non trouvé" });
+        }
+        
+        // Vérifie si le MDP est reconnu
+        const isMatch = await bcrypt.compare(password, user.password); 
         if (!isMatch) {
             return res.status(400).json({ message: 'Mot de passe incorrect' });
         }
         
+         // Si tout va bien, génère le token et renvoie les informations de l'utilisateur - Réponse de connexion réussie
         res.status(200).json({ 
             message: 'Connexion réussie', 
             token: user.token, 
