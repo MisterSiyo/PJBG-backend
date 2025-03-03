@@ -68,12 +68,12 @@ router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        if (!email || !password) { // Vérifie si tous les champs sont remplis
+        if (!email || !password) {  // Vérifie si tous les champs sont remplis
             return res.status(400).json({ error: 'Champ.s manquant.s' });
         }
 
-        const user = await User.findOne({ email });
-        if (!user) { // Vérifie si l'email est reconnu
+        const user = await User.findOne({ email });  // Vérifie si l'email est reconnu
+        if (!user) { 
             return res.status(400).json({ message: 'Email non reconnu' });
         }
 
@@ -81,8 +81,14 @@ router.post('/login', async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: 'Mot de passe incorrect' });
         }
-        //alert('Les mots de passe ne correspondent pas.');
-        res.status(200).json({ message: 'Connexion réussie', token: user.token });
+        
+        res.status(200).json({ 
+            message: 'Connexion réussie', 
+            token: user.token, 
+            username: user.username, 
+            role: user.role 
+        });
+
     } catch (error) {
         res.status(500).json({ message: 'Erreur serveur', error });
     }
