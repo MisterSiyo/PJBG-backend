@@ -2,12 +2,45 @@ const express = require("express");
 const router = express.Router();
 const Preference = require("../models/preferences");
 
+// Route pour récupérer les préférences d'un utilisateur
+router.get("/:username", async (req, res) => {
+  try {
+    const { username } = req.params;
+    const preference = await Preference.findOne({ username });
+
+    if (!preference) {
+      return res.status(404).json({
+        success: false,
+        message: "Préférences non trouvées",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: preference,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// Route pour sauvegarder les préférences d'un utilisateur
 router.post("/", async (req, res) => {
   try {
-    const { userId, preferences } = req.body;
+    const { username, preferences } = req.body;
+
+    if (!username) {
+      return res.status(400).json({
+        success: false,
+        message: "Le nom d'utilisateur est requis",
+      });
+    }
 
     // Vérifier si l'utilisateur a déjà des préférences
-    let existingPreference = await Preference.findOne({ userId });
+    let existingPreference = await Preference.findOne({ username });
 
     if (existingPreference) {
       // Mettre à jour les préférences existantes
@@ -16,35 +49,22 @@ router.post("/", async (req, res) => {
       await existingPreference.save();
     } else {
       // Créer de nouvelles préférences
-      const preference = new Preference({ userId, preferences });
+      const preference = new Preference({
+        username,
+        preferences,
+      });
       await preference.save();
     }
 
-    res
-      .status(200)
-      .json({ success: true, message: "Préférences sauvegardées" });
+    res.status(200).json({
+      success: true,
+      message: "Préférences sauvegardées",
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// Route pour récupérer les préférences d'un utilisateur
-router.get("/:userId", async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const preference = await Preference.findOne({ userId });
-
-    if (!preference) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Préférences non trouvées" });
-    }
-
-    res
-      .status(200)
-      .json({ success: true, preferences: preference.preferences });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 });
 
