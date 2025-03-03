@@ -15,10 +15,9 @@ router.get('/all', async (req, res) => { // !!!! attention, je n'ai pas filtré 
 });
 
 // route qui permet de donner les data d'un seul projet pour afficher la page d'un projet
-router.post('/title', async (req, res) => {
+router.get('/:query', async (req, res) => {
     try {
-        const {title} = req.body;
-        const project = await Project.find({title});
+        const project = await Project.findOne({pageURL: req.params.query});
         res.json({result: true, messsage: 'here is your project page', project})
 
     } catch (error) {
@@ -34,9 +33,12 @@ router.post('/', async (req, res) => {
         if (!user) {
             return res.status(404).json({result: false, error: 'user not found'})
         }
+        const spaces = / /g
+        const pageURL = title.trim().replace(spaces, '-')
 
         const newProject = new Project({
-            title,
+            title: title.trim(),
+            pageURL,
             imageURL: '', // lien vers la photo du profil du créateur
             pitch,
             detail: {
@@ -56,7 +58,7 @@ router.post('/', async (req, res) => {
             user : user._id,
         });
         await newProject.save();
-        const newCreatedProject = await Project.find({title}).populate('user').populate('histories.userPosting')
+        const newCreatedProject = await Project.find({title: title.trim()}).populate('user').populate('histories.userPosting')
         res.json({result: true, message: 'project created with success', newCreatedProject})
     } catch (error) {
         res.json({result: false, message: 'Oops, something went wrong', error})

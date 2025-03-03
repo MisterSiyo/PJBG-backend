@@ -63,6 +63,10 @@ const projectSchema = new mongoose.Schema(
             type: String,
             required: [true, 'a name is required for your project']
         },
+        pageURL: {
+            type: String,
+            required: [true, 'url required']
+        },
         imageURL: {
             type: String,
             required: false,
