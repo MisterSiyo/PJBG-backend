@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const pledgeSchema = new mongoose.Schema(
+const pledgeSchema = new mongoose.Schema( // les champs en commentaires sont des prospects pour plus tard, les laisser en commentaires pour le projet
     {
         pledgeId: {
             type: Number,
@@ -11,22 +11,22 @@ const pledgeSchema = new mongoose.Schema(
             type: Number,
             required: [true, 'level required'],
         },
-        rewardType: {
-            type: String,
-            required: [true, 'type is required']
-        },
+        // rewardType: {
+        //     type: String,
+        //     required: [true, 'type is required']
+        // },
         rewards: {
             type: [String],
             required: true,
         },
-        imageURL: {
-            type: String,
-            default: '', // !!! définir une image bidon en default
-            validator : function(d) {
-                return  /http\:\/\/.+/.test(d);
-            },
-            message: props => `${props.value} n'est pas une URL valide`
-        },
+        // imageURL: {
+        //     type: String,
+        //     default: '', // !!! définir une image bidon en default
+        //     validator : function(d) {
+        //         return  /http\:\/\/.+/.test(d);
+        //     },
+        //     message: props => `${props.value} n'est pas une URL valide`
+        // },
     }
 );
 
