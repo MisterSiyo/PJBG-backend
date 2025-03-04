@@ -176,7 +176,7 @@ const userSchema  = new mongoose.Schema(
              ref: 'gameMechanics'
             }
        ],
-        fundedProjects: fundedProjectsSchema, // Liste des projets financé par l'utilisateur
+        fundedProjects: [fundedProjectsSchema], // Liste des projets financé par l'utilisateur
         followedProjects: [ // Liste des projets que l'utilisateur suit (mais n'a pas forcément financé)
             {
             type: mongoose.Schema.Types.ObjectId, 
