@@ -102,12 +102,6 @@ const studioSchema = new mongoose.Schema(
             ref: 'projects'
             }
         ],
-        followedProjects: [ // Liste des projets que le studio suit sans forcément les avoir pris en charge pour dev
-            {
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: 'projects'
-            }
-        ],
 }
 );
 
