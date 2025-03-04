@@ -10,7 +10,7 @@ const detailSchema = mongoose.Schema({
         type: String,
         required: [true, 'a description is required for your project']
     },
-    gameMecanics: [{type: mongoose.Schema.Types.ObjectId, ref: 'gameMecanics'}],
+    gameMechanics: [{type: mongoose.Schema.Types.ObjectId, ref: 'gameMecanics'}],
     pledges: [{type: mongoose.Schema.Types.ObjectId, ref: 'pledges'}],
    });
 
