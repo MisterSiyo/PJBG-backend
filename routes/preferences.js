@@ -39,7 +39,7 @@ router.post("/", async (req, res) => {
     if (!username) {
       return res.status(400).json({
         success: false,
-        message: "username is required",
+        message: "Username is required",
       });
     }
 
@@ -62,7 +62,7 @@ router.post("/", async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Preferences saved",
+      message: "Preferences saved successfully",
     });
   } catch (error) {
     res.status(500).json({

@@ -4,6 +4,7 @@ const preferenceSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
+    unique: true,
   },
   preferences: {
     plus: {

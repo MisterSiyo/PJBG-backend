@@ -1,22 +1,25 @@
 const mongoose = require("mongoose");
 
-const favoriteSchema = new mongoose.Schema(
-  {
-    username: {
-      type: String,
-      required: [true, "Username is required"],
-      trim: true,
-    },
-    gameStyle: {
-      type: String,
-      required: [true, "Game style is required"],
-      trim: true,
-    },
+const favoriteSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
+    unique: true,
   },
-  { timestamps: true }
-);
+  favorites: {
+    type: Array,
+    default: [],
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
-// Créer un index composé pour éviter les doublons
-favoriteSchema.index({ username: 1, gameStyle: 1 }, { unique: true });
+const Favorite = mongoose.model("Favorites", favoriteSchema);
 
-module.exports = mongoose.model("Favorite", favoriteSchema);
+module.exports = Favorite;
