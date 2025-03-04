@@ -5,38 +5,39 @@ const router = express.Router();
 require("../models/connection");
 const User = require('../models/users');
 
-
 // Route pour la création d'un compte utilisateur
 router.post('/register', async (req, res) => {
-    const { username, email, password, role, socialLinks } = req.body;
+    const { username, email, password, role } = req.body;
 
-    if (role !== 'patron' && role !== 'studio') { // Vérifie que le rôle est bien intégré
-        return res.status(400).send('The role must be "boss" or "studio"');
+    if (role !== 'patron' && role !== 'studio') {
+        return res.status(400).json({ message: "The role must be 'patron' or 'studio'" });
+    }
+
+    if (!username || !email || !password) {
+        return res.status(400).json({ message: 'Missing fields' });
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: 'Invalid email' });
     }
 
     try {
-        if (!username || !email || !password) { // Vérifie que tous les champs sont remplis
-            return res.status(400).json({ error: 'Missing fields' });
-        }
-
-        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/; // Vérifie que l'email est valide (format)
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({ message: 'Invalid email' });
-        }
-
-        const existingUserByEmail = await User.findOne({ email }); // Vérifie si l'email n'est pas déjà utilisé
+        const existingUserByEmail = await User.findOne({ email });
         if (existingUserByEmail) { 
             return res.status(400).json({ message: 'This email is already in use.' });
         }
 
-        const existingUserByUsername = await User.findOne({ username }); // Vérifie si le username n'est pas déjà utilisé
+        const existingUserByUsername = await User.findOne({ username });
         if (existingUserByUsername) { 
             return res.status(400).json({ message: 'This username is already in use.' });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, 10); // Hash du mot de passe
+        if (role === 'studio' && (!address || !address.street || !address.postalCode || !address.city || !address.country)) {
+            return res.status(400).json({ message: 'Address is required for studios.' });
+        }
 
+        const hashedPassword = await bcrypt.hash(password, 10);
         const token = uid2(32);
 
         const newUser = new User({
@@ -45,56 +46,53 @@ router.post('/register', async (req, res) => {
             password: hashedPassword,
             token,
             role,
-            address:{
-                street: "135 rue Exemple", 
-                postalCode: "75015", 
-                city: "Paris",
-                country: "France"
-                },
-            socialLinks: socialLinks || {}, 
+            followedProjects: [],
+            createdProjects: [],
+            fundedProjects: [],
+            preferences: [],
+            secondChoices: [],
+            restrictions: [],
         });
 
         await newUser.save();
 
-        // Envoie le token après la création de l'utilisateur pour le connecter immédiatement
-        res.status(201).json({ message: 'User created successfully', token, username: newUser.username, role: newUser.role });
+        res.status(201).json({ 
+            message: 'User created successfully', 
+            token, 
+            username: newUser.username, 
+            role: newUser.role 
+        });
+
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
     }
 });
-
 
 // Route pour la connexion d'un utilisateur
 router.post('/login', async (req, res) => {
     try {
         const { email, username, password } = req.body;
 
-        // Vérifie que l'utilisateur a bien rempli au moins l'email OU le username et le mot de passe
         if ((!email && !username) || !password) {
-            return res.status(400).json({ message: "Missing field: email/username or password"});
+            return res.status(400).json({ message: "Missing field: email/username or password" });
         }
 
         let user;
-
-        // Recherche dans le BDD de l'utilisateur soit par email, soit par username
         if (email) {
             user = await User.findOne({ email });
         } else if (username) {
             user = await User.findOne({ username });
         }
 
-        // Si aucun utilisateur n'est trouvé, renvoie une erreur en fonction de l'identifiant utilisé
         if (!user) {
             return res.status(400).json({ message: "User not found" });
         }
         
-        // Vérifie si le MDP est reconnu
         const isMatch = await bcrypt.compare(password, user.password); 
         if (!isMatch) {
             return res.status(400).json({ message: 'Incorrect password' });
         }
         
-         // Si tout va bien, génère le token et renvoie les informations de l'utilisateur - Réponse de connexion réussie
         res.status(200).json({ 
             message: 'Connection successful', 
             token: user.token, 

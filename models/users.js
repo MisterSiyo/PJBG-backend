@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 // Schéma pour les adresses (=sous document de user)
 const adressSchema = new mongoose.Schema(
     { 
-        street: { type: String, required: true }, 
-        postalCode: { type: String, required: true }, 
-        city: { type: String, required: true }, 
-        country: { type: String, required: true } 
+        street: { type: String}, 
+        postalCode: { type: String}, 
+        city: { type: String}, 
+        country: { type: String} 
     },
 )
 
@@ -24,20 +24,20 @@ const socialLinksSchema = new mongoose.Schema(
 // Schéma pour les personne de contact du studio (=sous document de user)
 const contactPersonSchema = new mongoose.Schema(
     { 
-        name: { type: String, required: true }, 
-        surname: { type: String, required: true }, 
-        email: { type: String, required: true }, 
-        phone: { type: String, required: true } 
+        name: { type: String}, 
+        surname: { type: String}, 
+        email: { type: String}, 
+        phone: { type: String} 
     },
 )
 
 // Schéma pour les managers du studio (=sous document de user)
 const contactManagerSchema = new mongoose.Schema(
     { 
-        name: { type: String, required: true }, 
-        surname: { type: String, required: true }, 
-        email: { type: String, required: true }, 
-        phone: { type: String, required: true } 
+        name: { type: String}, 
+        surname: { type: String}, 
+        email: { type: String}, 
+        phone: { type: String} 
     },
 )
  // Liste des projets que l'utilisateur suit (mais n'a pas forcément financé) (=sous document de user)
@@ -139,20 +139,15 @@ const userSchema  = new mongoose.Schema(
         ],
         name: {
             type: String,
-            required: false,
-            unique: true,
         },
         surname: {
             type: String,
-            required: false,
-            unique: true,
         },
         address: [
             adressSchema
          ],
         phone: {
             type: String,
-            required: false,
             unique: true,
         },
         preferences: // Genre de jeux préférés
