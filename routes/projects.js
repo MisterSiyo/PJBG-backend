@@ -28,7 +28,7 @@ router.get('/:query', async (req, res) => {
 // route qui permet de créer un projet en base de données
 router.post('/', async (req, res) => { 
     try {
-        const {token, title, pitch, description, goal} = req.body; // !!! gameMechanics et pledges à rajouter
+        const {token, title, pitch, description, goal, pledges, gameMechanics} = req.body; // !!! gameMechanics et pledges à rajouter
         const user = await User.findOne({token});
         if (!user) {
             return res.status(404).json({result: false, error: 'cant touch this'})
@@ -43,8 +43,8 @@ router.post('/', async (req, res) => {
             pitch,
             detail: {
                 description,
-                // gameMechanics,
-                // pledges,
+                gameMechanics,
+                pledges,
             },
             histories: [{
                 historyType: 'news',

@@ -4,8 +4,6 @@ const gameMechanicSchema = new mongoose.Schema( // les champs en commentaires so
     {
         name: {
             type: String,
-            required: [true, 'name of mechanic required'],
-            trim: true,
         },
         // imageURL: {
         //     type: String,
@@ -17,8 +15,6 @@ const gameMechanicSchema = new mongoose.Schema( // les champs en commentaires so
         // },
         description: {
             type: String,
-            required: [true, 'description is required'],
-            minlength: [6, 'please describe more'],
         },
     }
 );
