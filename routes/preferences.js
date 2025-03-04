@@ -9,15 +9,19 @@ router.get("/:username", async (req, res) => {
     const preference = await Preference.findOne({ username });
 
     if (!preference) {
-      return res.status(404).json({
-        success: false,
-        message: "Préférences non trouvées",
+      return res.status(200).json({
+        success: true,
+        preferences: {
+          plus: [],
+          moins: [],
+          blackList: [],
+        },
       });
     }
 
     res.status(200).json({
       success: true,
-      data: preference,
+      preferences: preference.preferences,
     });
   } catch (error) {
     res.status(500).json({
@@ -35,7 +39,7 @@ router.post("/", async (req, res) => {
     if (!username) {
       return res.status(400).json({
         success: false,
-        message: "Le nom d'utilisateur est requis",
+        message: "username is required",
       });
     }
 
@@ -58,7 +62,7 @@ router.post("/", async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Préférences sauvegardées",
+      message: "Preferences saved",
     });
   } catch (error) {
     res.status(500).json({

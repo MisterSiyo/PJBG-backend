@@ -13,6 +13,7 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const projectsRouter = require("./routes/projects");
 const preferencesRouter = require("./routes/preferences");
+const favoritesRouter = require("./routes/favorites");
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -32,5 +33,6 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/projects", projectsRouter);
 app.use("/api/preferences", preferencesRouter);
+app.use("/api/favorites", favoritesRouter);
 
 module.exports = app;
