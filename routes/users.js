@@ -97,8 +97,16 @@ router.post('/login', async (req, res) => {
         res.status(200).json({ 
             message: 'Connexion réussie', 
             token: user.token, 
-            username: user.username, 
-            role: user.role 
+            username: user.username,
+            role: user.role,
+            followedProjects: user.followedProjects,
+            createdProjects: user.createdProjects,
+            fundedProjects: user.fundedProjects,
+            preferences: user.preferences,
+            secondChoices: user.secondChoices,
+            restrictions: user.restrictions,
+            appliedProjects: user.appliedProjects,
+            developpedProjects: user.developpedProjects
         });
 
     } catch (error) {
