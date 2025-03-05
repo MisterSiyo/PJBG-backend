@@ -131,43 +131,8 @@ const studioSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "projects",
         },
-<<<<<<< HEAD
-        companyName: {
-            type: String,
-            required: true,
-            unique: true,
-        },
-        brand: { 
-            type: String
-        }, 
-        subBrand: { 
-            type: String
-        }, 
-        contactPerson: [
-           contactPersonSchema
-        ],
-        contactManager: [
-            contactManagerSchema
-        ],
-        chosenProjects: [ // Liste des projets auquels le studio à postulé
-            {
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: 'projects'
-            }
-        ],
-        developedProjects: [ // Liste des projets dévelopés / en cours de developpement par le studio
-            {
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: 'projects'
-            }
-        ],
-}
-);
-=======
-    ],
-});
->>>>>>> SirectCheck
 
+    ]})
 // Schéma des users (= studios + backers)
 const userSchema = new mongoose.Schema(
   {
@@ -230,19 +195,11 @@ const userSchema = new mongoose.Schema(
 );
 
 // Vérification : studioInfo obligatoire si role = "studio"
-<<<<<<< HEAD
-userSchema.pre("save", function (next) {
-  if (this.role === "studio" && !this.studioInfo) {
-    return next(new Error("Les studios doivent avoir un studioInfo rempli."));
-  }
-  next();
-=======
 userSchema.pre('save', function (next) {
     if (this.role === 'studio' && !this.studio) {
         return next(new Error('Les studios doivent avoir un studioInfo rempli.'));
     }
     next();
->>>>>>> SirectCheck
 });
 
 const User = mongoose.model("users", userSchema);
