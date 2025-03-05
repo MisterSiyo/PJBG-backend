@@ -128,15 +128,27 @@ router.post('/', async (req, res) => {
 // les routes ci-dessous sont en cours de création, ne pas toucher svp !!!!
 
 // route qui permet à un user de contribuer financièrement à un projet
-// router.post('/backing', (req, res) => {
+router.post('/backing', async (req, res) => {
 
-//     const {projectId, userContributing, pledgeChosen} = req.body;
-//     let nextId = null;
-//     let isPledgePayed = true; // c'est ici (à la place de mon forcing de true) qu'il faudra faire un appel API à la banque pour vérifier leur OK
-//     Project.find({projectId}).then(data => {
-//         nextId = data.progressions.length +1;
-//     })
+    const {projectId, userContributing, pledgeChosen} = req.body;
+    let isPledgePayed = true; // c'est ici (à la place de mon forcing de true) qu'il faudra faire un appel API à la banque pour vérifier leur OK
+    try {
+        const nextId = (await Project.find({projectId})).progressions.length +1;
+        const project = await Project.updateOne({projectId}, 
+            {progressions: {
+            contributionId: nextId,
+            userContributing,
+            pledgeChosen,
+            isPledgePayed,
+        }})
+
+    }
+    catch (error) {
+        
+    }
     
+})
+
 //     Project.updateOne({projectId}, {progressions: {
 //         contributionId: nextId,
 //         userContributing,
