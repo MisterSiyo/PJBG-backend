@@ -74,10 +74,6 @@ const studioSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
-        description: {
-            type: String,
-            required: true,
-        },
         brand: { 
             type: String
         }, 
@@ -149,6 +145,9 @@ const userSchema  = new mongoose.Schema(
         phone: {
             type: String,
             unique: true,
+        },
+        description: {  
+            type: String,
         },
         preferences: // Genre de jeux préférés
         [ 
