@@ -131,8 +131,9 @@ const studioSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "projects",
         },
+    ],
+});
 
-    ]})
 // Schéma des users (= studios + backers)
 const userSchema = new mongoose.Schema(
   {

@@ -6,7 +6,27 @@ const User = require('../models/users');
 // route qui envoie le catalogue complet au front-end 
 router.get('/all', async (req, res) => { // !!!! attention, je n'ai pas filtré par catégories de user, donc à voir ou on fait ça, front ou back
     try {
-        const projectsData = await Project.find({});
+        const projectsData = await Project.find({})
+        .select('-__v')
+        .populate({
+            path:'user',
+            select: 'username role followedProjects fundedProjects -_id'
+        })
+        .populate({
+            path: 'detail.pledges', 
+            model: 'Pledges',
+            select: '-_id'
+        })
+        .populate({
+            path: 'detail.gameMechanics', 
+            model: 'gameMechanics',
+            select: '-_id'
+        })
+        .populate({
+            path: 'histories.userPosting',
+            select: 'username role'
+        })
+        ;
         res.status(200).json({result: true, message: 'here are your results', projectsData});
         
     } catch (error) {
@@ -17,7 +37,27 @@ router.get('/all', async (req, res) => { // !!!! attention, je n'ai pas filtré 
 // route qui permet de donner les data d'un seul projet pour afficher la page d'un projet
 router.get('/:query', async (req, res) => {
     try {
-        const project = await Project.findOne({pageURL: req.params.query});
+        const project = await Project.findOne({pageURL: req.params.query})
+        .select('-__v')
+        .populate({
+            path:'user',
+            select: 'username role followedProjects fundedProjects -_id'
+        })
+        .populate({
+            path: 'detail.pledges', 
+            model: 'Pledges',
+            select: '-_id'
+        })
+        .populate({
+            path: 'detail.gameMechanics', 
+            model: 'gameMechanics',
+            select: '-_id'
+        })
+        .populate({
+            path: 'histories.userPosting',
+            select: 'username role'
+        });
+
         res.json({result: true, messsage: 'here is your project page', project})
 
     } catch (error) {
@@ -58,7 +98,27 @@ router.post('/', async (req, res) => {
             user : user._id,
         });
         await newProject.save();
-        const newCreatedProject = await Project.findOne({title: title.trim()}).populate('user').populate('histories.userPosting')
+        const newCreatedProject = await Project.findOne({title: title.trim()})
+        .select('-__v')
+        .populate({
+            path:'user',
+            select: 'username role followedProjects fundedProjects -_id'
+        })
+        .populate({
+            path: 'detail.pledges', 
+            model: 'Pledges',
+            select: '-_id'
+        })
+        .populate({
+            path: 'detail.gameMechanics', 
+            model: 'gameMechanics',
+            select: '-_id'
+        })
+        .populate({
+            path: 'histories.userPosting',
+            select: 'username role'
+        });
+        
         res.json({result: true, message: 'project created with success', newCreatedProject})
     } catch (error) {
         res.json({result: false, message: 'Oops, something went wrong', error})
@@ -68,15 +128,27 @@ router.post('/', async (req, res) => {
 // les routes ci-dessous sont en cours de création, ne pas toucher svp !!!!
 
 // route qui permet à un user de contribuer financièrement à un projet
-// router.post('/backing', (req, res) => {
+router.post('/backing', async (req, res) => {
 
-//     const {projectId, userContributing, pledgeChosen} = req.body;
-//     let nextId = null;
-//     let isPledgePayed = true; // c'est ici (à la place de mon forcing de true) qu'il faudra faire un appel API à la banque pour vérifier leur OK
-//     Project.find({projectId}).then(data => {
-//         nextId = data.progressions.length +1;
-//     })
+    const {projectId, userContributing, pledgeChosen} = req.body;
+    let isPledgePayed = true; // c'est ici (à la place de mon forcing de true) qu'il faudra faire un appel API à la banque pour vérifier leur OK
+    try {
+        const nextId = (await Project.find({projectId})).progressions.length +1;
+        const project = await Project.updateOne({projectId}, 
+            {progressions: {
+            contributionId: nextId,
+            userContributing,
+            pledgeChosen,
+            isPledgePayed,
+        }})
+
+    }
+    catch (error) {
+        
+    }
     
+})
+
 //     Project.updateOne({projectId}, {progressions: {
 //         contributionId: nextId,
 //         userContributing,
