@@ -1,13 +1,65 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const uid2 = require('uid2');
+const fetch = require('node-fetch');
+require("dotenv").config();
 const router = express.Router();
 require("../models/connection");
 const User = require('../models/users');
 
+const API_BASE_URL = "https://api.societe.com/api/v1";
+const API_KEY = process.env.CLE_API_SOCIETE;
+
+// 🛠️ Fonction de formatage des données d'une entreprise
+const formatCompanyInfo = (data) => ({
+    siret: data.siretsiegeformat || "N/A",
+    siren: data.sirenformat || "N/A",
+    companyName: data.denoinsee || "N/A",
+    numtva: data.numtva || "N/A",
+    naf: data.nafinsee ? `${data.nafinsee} - ${data.naflibinsee}` : "N/A",
+    rcs: data.rcs || "N/A",
+    greffe: data.nomgreffe ? `${data.nomgreffe} (${data.codegreffe})` : "N/A",
+    capital: data.capital ? `${data.capital} ${data.libdevise}` : "N/A",
+    status: data.catjurlibinsee || "N/A",
+    address: {
+        street: `${data.numvoieinsee || ""} ${data.typvoieinsee || ""} ${data.libvoieinsee || ""}`.trim(),
+        postalCode: data.codepostalinsee || "N/A",
+        city: data.villeinsee || "N/A",
+        country: data.paysinsee || "N/A"
+    }
+});
+
+// 🎯 Route pour récupérer les infos d'une entreprise via son SIRET
+router.get('/siret/:siret', async (req, res) => {
+    try {
+        const { siret } = req.params;
+
+        if (siret.length !== 14 || isNaN(siret)) {
+            return res.status(400).json({ message: "Le SIRET doit contenir 14 chiffres valides." });
+        }
+
+        const response = await fetch(`${API_BASE_URL}/entreprise/${siret}/infoslegales`, {
+            method: 'GET',
+            headers: {
+                'X-Authorization': `socapi ${API_KEY}`
+            }
+        });
+
+        if (!response.ok) throw new Error('SIRET introuvable');
+
+        const data = await response.json();
+        const companyInfo = formatCompanyInfo(data.infolegales);
+
+        res.json(companyInfo);
+    } catch (error) {
+        res.status(500).json({ message: "Erreur lors de la récupération des informations.", error: error.message });
+    }
+});
+
+
 // Route pour la création d'un compte utilisateur
 router.post('/register', async (req, res) => {
-    const { username, email, password, role } = req.body;
+    const { username, email, password, role, companyInfo } = req.body;
 
     if (role !== 'patron' && role !== 'studio') {
         return res.status(400).json({ message: "The role must be 'patron' or 'studio'" });
@@ -33,14 +85,14 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: 'This username is already in use.' });
         }
 
-        if (role === 'studio' && (!address || !address.street || !address.postalCode || !address.city || !address.country)) {
+        if (role === 'studio' && (!companyInfo || !companyInfo.address)) {
             return res.status(400).json({ message: 'Address is required for studios.' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const token = uid2(32);
 
-        const newUser = new User({
+        const newUserData = {
             username,
             email,
             password: hashedPassword,
@@ -52,8 +104,27 @@ router.post('/register', async (req, res) => {
             preferences: [],
             secondChoices: [],
             restrictions: [],
-        });
-
+        };
+        
+        if (role === 'studio' && companyInfo) {
+            const formattedCompany = formatCompanyInfo(companyInfo);
+        
+            newUser.studio = {
+                siret: formattedCompany.siret,
+                companyName: formattedCompany.companyName,
+                numtva: formattedCompany.numtva,
+                naf: formattedCompany.naf,
+                rcs: formattedCompany.rcs,
+                greffe: formattedCompany.greffe,
+                capital: formattedCompany.capital,
+                status: formattedCompany.status,
+                address: formattedCompany.address
+            };
+        }
+        
+        
+        const newUser = new User(newUserData);
+        
         await newUser.save();
 
         res.status(201).json({ 
