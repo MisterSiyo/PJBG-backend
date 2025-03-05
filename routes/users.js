@@ -2,15 +2,14 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const uid2 = require('uid2');
 const fetch = require('node-fetch');
-require("dotenv").config();
-const router = express.Router();
-require("../models/connection");
+
 const User = require('../models/users');
+const router = express.Router();
 
 const API_BASE_URL = "https://api.societe.com/api/v1";
 const API_KEY = process.env.CLE_API_SOCIETE;
 
-// 🛠️ Fonction de formatage des données d'une entreprise
+// Fonction de formatage des données d'une entreprise
 const formatCompanyInfo = (data) => ({
     siret: data.siretsiegeformat || "N/A",
     siren: data.sirenformat || "N/A",
@@ -29,7 +28,7 @@ const formatCompanyInfo = (data) => ({
     }
 });
 
-// 🎯 Route pour récupérer les infos d'une entreprise via son SIRET
+// Route pour récupérer les infos d'une entreprise via son SIRET
 router.get('/siret/:siret', async (req, res) => {
     try {
         const { siret } = req.params;
@@ -59,6 +58,7 @@ router.get('/siret/:siret', async (req, res) => {
 
 // Route pour la création d'un compte utilisateur
 router.post('/register', async (req, res) => {
+    console.log("Received body:", req.body);
     const { username, email, password, role, companyInfo } = req.body;
 
     if (role !== 'patron' && role !== 'studio') {
@@ -107,9 +107,10 @@ router.post('/register', async (req, res) => {
         };
         
         if (role === 'studio' && companyInfo) {
-            const formattedCompany = formatCompanyInfo(companyInfo);
-        
-            newUser.studio = {
+            const formattedCompany = companyInfo.address ? companyInfo : formatCompanyInfo(companyInfo);
+            newUserData.studio = formattedCompany;
+                        
+            newUserData.studio = {
                 siret: formattedCompany.siret,
                 companyName: formattedCompany.companyName,
                 numtva: formattedCompany.numtva,
@@ -120,6 +121,7 @@ router.post('/register', async (req, res) => {
                 status: formattedCompany.status,
                 address: formattedCompany.address
             };
+            return;
         }
         
         

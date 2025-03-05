@@ -57,53 +57,74 @@ const fundedProjectsSchema = new mongoose.Schema(
 )
 
 // Schéma des infos spécifiques aux studios (=sous document de user)
-const studioSchema = new mongoose.Schema(
-    {
-        siret:{
-            type: String,
-            required: true,  
-            unique: true,
+const studioSchema = new mongoose.Schema({
+    siret: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    siren: {
+        type: String,
+        required: true,
+    },
+    companyName: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    numtva: {
+        type: String,
+    },
+    naf: {
+        type: String,
+    },
+    rcs: {
+        type: String,
+    },
+    greffe: {
+        type: String,
+    },
+    capital: {
+        type: String,
+    },
+    status: {
+        type: String,
+    },
+    webSite: {
+        type: String, 
+    },
+    description: {
+        type: String, 
+    },
+    brand: {
+        type: String, 
+    },
+    subBrand: {
+        type: String, 
+    },
+    contactPerson: [contactPersonSchema],
+    contactManager: [contactManagerSchema],
+
+    address: {
+        street: { type: String },
+        postalCode: { type: String },
+        city: { type: String },
+        country: { type: String },
+    },
+
+    chosenProjects: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "projects",
         },
-        webSite: {
-            type: String,
-            required: true, 
-            unique: true,
+    ],
+    developedProjects: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "projects",
         },
-        companyName: {
-            type: String,
-            required: true,
-            unique: true,
-        },
-        description: {
-            type: String,
-            required: true,
-        },
-        brand: { 
-            type: String
-        }, 
-        subBrand: { 
-            type: String
-        }, 
-        contactPerson: [
-           contactPersonSchema
-        ],
-        contactManager: [
-            contactManagerSchema
-        ],
-        chosenProjects: [ // Liste des projets auquels le studio à postulé
-            {
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: 'projects'
-            }
-        ],
-        developedProjects: [ // Liste des projets dévelopés / en cours de developpement par le studio
-            {
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: 'projects'
-            }
-        ],
-}
-);
+    ],
+});
 
 // Schéma des users (= studios + backers)
 const userSchema  = new mongoose.Schema(
@@ -189,7 +210,7 @@ const userSchema  = new mongoose.Schema(
 
 // Vérification : studioInfo obligatoire si role = "studio"
 userSchema.pre('save', function (next) {
-    if (this.role === 'studio' && !this.studioInfo) {
+    if (this.role === 'studio' && !this.studio) {
         return next(new Error('Les studios doivent avoir un studioInfo rempli.'));
     }
     next();
