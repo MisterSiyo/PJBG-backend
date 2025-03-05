@@ -65,49 +65,49 @@ const userFavoritesSchema = new mongoose.Schema({
 });
 
 // Schéma des infos spécifiques aux studios (=sous document de user)
-const studioSchema = new mongoose.Schema({
-  siret: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  webSite: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  companyName: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  brand: {
-    type: String,
-  },
-  subBrand: {
-    type: String,
-  },
-  contactPerson: [contactPersonSchema],
-  contactManager: [contactManagerSchema],
-  chosenProjects: [
-    // Liste des projets auquels le studio à postulé
+const studioSchema = new mongoose.Schema(
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "projects",
-    },
-  ],
-  developedProjects: [
-    // Liste des projets dévelopés / en cours de developpement par le studio
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "projects",
-    },
-  ],
-});
+        siret:{
+            type: String,
+            required: true,  
+            unique: true,
+        },
+        webSite: {
+            type: String,
+            required: true, 
+            unique: true,
+        },
+        companyName: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+        brand: { 
+            type: String
+        }, 
+        subBrand: { 
+            type: String
+        }, 
+        contactPerson: [
+           contactPersonSchema
+        ],
+        contactManager: [
+            contactManagerSchema
+        ],
+        chosenProjects: [ // Liste des projets auquels le studio à postulé
+            {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'projects'
+            }
+        ],
+        developedProjects: [ // Liste des projets dévelopés / en cours de developpement par le studio
+            {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'projects'
+            }
+        ],
+}
+);
 
 // Schéma des users (= studios + backers)
 const userSchema = new mongoose.Schema(
@@ -150,6 +150,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
+        description: {  
+            type: String,
+        },
     fundedProjects: [fundedProjectsSchema], // Liste des projets financé par l'utilisateur
     followedProjects: [
       // Liste des projets que l'utilisateur suit (mais n'a pas forcément financé)

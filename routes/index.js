@@ -1,13 +1,22 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 require('../models/connection');
 const GameMechanic = require('../models/gameMechanics');
 const Pledge = require('../models/pledges');
+const accountRoutes = require('./account'); // Import des routes
+
+// Utilisation des routes
+router.use('/account', accountRoutes);
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.json({ message: 'Bienvenue sur la page d\'accueil de l\'API' });
 });
+
+/* GET home page. 
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'Express' });
+});*/
 
 router.get('/characteristics', async (req, res) => {
   try {
