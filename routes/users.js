@@ -58,7 +58,7 @@ router.get('/siret/:siret', async (req, res) => {
 
 // Route pour la création d'un compte utilisateur
 router.post('/register', async (req, res) => {
-    console.log("Received body:", req.body);
+    // console.log("Received body:", req.body);
     const { username, email, password, role, companyInfo } = req.body;
 
   if (role !== "patron" && role !== "studio") {
@@ -92,11 +92,10 @@ router.post('/register', async (req, res) => {
         if (role === 'studio' && (!companyInfo || !companyInfo.address)) {
             return res.status(400).json({ message: 'Address is required for studios.' });
         }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const token = uid2(32);
-
-
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const token = uid2(32);
+        
+        
         const newUserData = {
             username,
             email,
@@ -111,15 +110,17 @@ router.post('/register', async (req, res) => {
                 favoritesPlus: [],
                 favoritesMinus: [],
                 blackList: [],
-              },
+            },
         };
         
+        console.log('fun check')
         if (role === 'studio' && companyInfo) {
             const formattedCompany = companyInfo.address ? companyInfo : formatCompanyInfo(companyInfo);
             newUserData.studio = formattedCompany;
                         
             newUserData.studio = {
                 siret: formattedCompany.siret,
+                siren: formattedCompany.siren,
                 companyName: formattedCompany.companyName,
                 numtva: formattedCompany.numtva,
                 naf: formattedCompany.naf,
@@ -129,7 +130,6 @@ router.post('/register', async (req, res) => {
                 status: formattedCompany.status,
                 address: formattedCompany.address
             };
-            return;
         }
         
         
@@ -144,6 +144,7 @@ router.post('/register', async (req, res) => {
       role: newUser.role,
     });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: "Server error", error });
   }
 });
