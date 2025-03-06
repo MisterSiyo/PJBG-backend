@@ -27,7 +27,7 @@ const historySchema = mongoose.Schema({
 const progressionSchema = mongoose.Schema({
    contributionId: Number,
    userContributing: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
-   pledgeChosen: String, // !!! à corriger, il faut voir comment faire car je m'y perd un peu là
+   pledgeChosen: {type: mongoose.Schema.Types.ObjectId, ref: 'pledges'},
     isPledgePayed: Boolean,
    });
 

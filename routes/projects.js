@@ -2,9 +2,10 @@ var express = require('express');
 var router = express.Router();
 const Project = require('../models/projects');
 const User = require('../models/users');
+const Pledge = require('../models/pledges');
 
 // route qui envoie le catalogue complet au front-end 
-router.get('/all', async (req, res) => { // !!!! attention, je n'ai pas filtré par catégories de user, donc à voir ou on fait ça, front ou back
+router.get('/get/all', async (req, res) => { // !!!! attention, je n'ai pas filtré par catégories de user, donc à voir ou on fait ça, front ou back
     try {
         const projectsData = await Project.find({})
         .select('-__v')
@@ -128,71 +129,59 @@ router.post('/', async (req, res) => {
 // les routes ci-dessous sont en cours de création, ne pas toucher svp !!!!
 
 // route qui permet à un user de contribuer financièrement à un projet
-router.post('/backing', async (req, res) => {
+router.put('/backing', async (req, res) => {
 
-    const {projectId, userContributing, pledgeChosen} = req.body;
+    const {projectId, token, pledgeId} = req.body;
     let isPledgePayed = true; // c'est ici (à la place de mon forcing de true) qu'il faudra faire un appel API à la banque pour vérifier leur OK
     try {
-        const nextId = (await Project.find({projectId})).progressions.length +1;
-        const project = await Project.updateOne({projectId}, 
-            {progressions: {
+        const userContributing = (await User.findOne({token}))._id;
+        const nextId = (await Project.findById(projectId)).progressions.length +1;
+        const pledgeChosen = (await Pledge.findOne({pledgeId}))._id;
+        const project = await Project.updateOne({_id: projectId},
+            {$push: {progressions: {
             contributionId: nextId,
             userContributing,
             pledgeChosen,
             isPledgePayed,
-        }})
-
+        }}})
+        res.json({result: true})
     }
     catch (error) {
-        
+        res.status(403).json({result : false, error})
     }
-    
 })
-
-//     Project.updateOne({projectId}, {progressions: {
-//         contributionId: nextId,
-//         userContributing,
-//         pledgeChosen,
-//         isPledgePayed,
-//     }}).then(data => {
-
-//         if (data && data.isPledgePayed) {
-//             res.json({result: true, message: 'you just backed a very cool project, congrats', data})
-//         } else if (data && !data.isPledgePayed) {
-//             res.json({result: false, error: 'Oops, payment did not pass, please retry later'}) // ce chemin là n'arrivera jamais pour le moment, mais il est déjà posé pour plus tard
-//         } else {
-//             res.json({result: false, error: 'Oops, something went wrong'})
-//         }
-//     })
-// });
 
 // route qui permet de poster un message dans le chat du projet
 
-// router.post('/message', async (req, res) => {
+router.post('/messages/:query', async (req, res) => {
 
-//     try {
+    const pageURL = req.params.query;
+    const {token, message} = req.body;
+    console.log( 'voici mes datas : ', pageURL, token, message)
+    try {
+        const projectId = (await Project.findOne({pageURL}))._id;
+        const userPosting = (await User.findOne({token}))._id;
+        const updateMessage = await Project.findByIdAndUpdate(projectId, 
+            {$push: {
+                histories: {
+                    historyType: "chatMessage", 
+                    message, 
+                    date: new Date(), 
+                    userPosting
+                    }
+                }
+            }
+        )
+        if (updateMessage) {
+            const i = (await Project.findById(projectId)).histories.length -1;
+            const updatedMessage = (await Project.findById(projectId)).histories[i];
+            res.json({result: true, message: 'here is your message', updatedMessage});
+        }
 
-//         const {projectId, userPosting, message} = req.body;
-
-//         const updateMessage = await Project.updateOne({projectId}, 
-//             {$push: {
-//                 histories: {
-//                     historyType: "chatMessage", 
-//                     message, 
-//                     date: new Date(), 
-//                     userPosting
-//                     }
-//                 }
-//             }
-//         )
-//         if (updateMessage) {
-//             res.json({result: true, message: 'here is your message', updateMessage});
-//         }
-
-//     } catch (error) {
-//         res.status(403).json({result: false, message: 'cant touch this', error})
-//     }
-// })
+    } catch (error) {
+        res.status(403).json({result: false, message: 'cant touch this', error})
+    }
+})
 
 
 
