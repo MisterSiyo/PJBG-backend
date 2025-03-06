@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 // Schéma pour les adresses (=sous document de user)
 const adressSchema = new mongoose.Schema({
+  streetNumber: { type: String },
   street: { type: String },
   postalCode: { type: String },
   city: { type: String },
@@ -114,6 +115,7 @@ const studioSchema = new mongoose.Schema({
     contactManager: [contactManagerSchema],
 
     address: {
+        streetNumber: { type: String },
         street: { type: String },
         postalCode: { type: String },
         city: { type: String },

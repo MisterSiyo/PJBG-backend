@@ -15,6 +15,7 @@ const authenticate = (req, res, next) => {
             return res.status(401).json({ message: 'Unauthorized' });
         }
         req.user = decoded;  // Décoder et ajouter l'utilisateur à la requête
+        console.log('Decoded user:', decoded);  // Ajoute ce log pour vérifier
         next();  // Passer à la prochaine fonction (ici, la route du controller)
     });
 };
