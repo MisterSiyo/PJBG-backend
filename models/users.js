@@ -175,9 +175,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
-        description: {  
-            type: String,
-        },
+    description: {  
+      type: String,
+    },
     fundedProjects: [fundedProjectsSchema], // Liste des projets financé par l'utilisateur
     followedProjects: [
       // Liste des projets que l'utilisateur suit (mais n'a pas forcément financé)

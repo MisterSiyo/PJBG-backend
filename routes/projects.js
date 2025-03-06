@@ -57,7 +57,18 @@ router.get('/:query', async (req, res) => {
         .populate({
             path: 'histories.userPosting',
             select: 'username role'
-        });
+        })
+        .populate({
+            path: 'studiosPreVote',
+            model: 'users',
+            select: 'studio'
+        })
+        .populate({
+            path: 'studioValidated',
+            model: 'users',
+            select: 'studio'
+        })
+        ;
 
         res.json({result: true, messsage: 'here is your project page', project})
 
@@ -174,7 +185,7 @@ router.post('/messages/:query', async (req, res) => {
         )
         if (updateMessage) {
             const i = (await Project.findById(projectId)).histories.length -1;
-            const updatedMessage = (await Project.findById(projectId)).histories[i];
+            const updatedMessage = (await Project.findById(projectId).populate({path: "histories.userPosting", model: "users", select: "username role -_id"})).histories[i];
             res.json({result: true, message: 'here is your message', updatedMessage});
         }
 
