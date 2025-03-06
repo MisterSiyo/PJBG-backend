@@ -148,14 +148,14 @@ router.put('/backing', async (req, res) => {
         const userContributing = (await User.findOne({token}))._id;
         const nextId = (await Project.findById(projectId)).progressions.length +1;
         const pledgeChosen = (await Pledge.findOne({pledgeId}))._id;
-        const project = await Project.updateOne({_id: projectId},
+        const project = await Project.findByIdAndUpdate(projectId,
             {$push: {progressions: {
             contributionId: nextId,
             userContributing,
             pledgeChosen,
             isPledgePayed,
         }}})
-        res.json({result: true})
+        res.json({result: true, project})
     }
     catch (error) {
         res.status(403).json({result : false, error})
