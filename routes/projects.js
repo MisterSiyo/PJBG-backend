@@ -155,7 +155,13 @@ router.put('/backing', async (req, res) => {
             pledgeChosen,
             isPledgePayed,
         }}})
-        res.json({result: true, project})
+        const check = await User.findByIdAndUpdate(userContributing, {
+            $push: {fundedProjects: {
+                project: projectId,
+                pledgeChosen
+            }}
+        })
+        res.json({result: true, project, check})
     }
     catch (error) {
         res.status(403).json({result : false, error})

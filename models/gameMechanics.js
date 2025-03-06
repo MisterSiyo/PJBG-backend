@@ -16,6 +16,9 @@ const gameMechanicSchema = new mongoose.Schema( // les champs en commentaires so
         description: {
             type: String,
         },
+        GMType: {
+            type: String,
+        }
     }
 );
 
