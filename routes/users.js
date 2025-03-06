@@ -141,6 +141,7 @@ router.post('/register', async (req, res) => {
       message: "User created successfully",
       token,
       username: newUser.username,
+      email: newUser.email,
       role: newUser.role,
     });
   } catch (error) {
@@ -180,6 +181,7 @@ router.post("/login", async (req, res) => {
       token: user.token,
       username: user.username,
       role: user.role,
+      email: user.email,
       followedProjects: user.followedProjects,
       createdProjects: user.createdProjects,
       fundedProjects: user.fundedProjects,
