@@ -133,8 +133,8 @@ const projectSchema = new mongoose.Schema(
         },
 
         // la liste de tous les studios ayant souhaité prendre en main le projet
-        studiosPreVote: [{type: mongoose.Schema.Types.ObjectId, ref: 'studios'}],
-        studioValidated: {type: mongoose.Schema.Types.ObjectId, ref: 'studios'},
+        studiosPreVote: [{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
+        studioValidated: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
 
         // le user ayant créé le projet
         user: {type: mongoose.Schema.Types.ObjectId, ref: 'users'}
