@@ -153,31 +153,35 @@ router.put('/backing', async (req, res) => {
 
 // route qui permet de poster un message dans le chat du projet
 
-// router.post('/message', async (req, res) => {
+router.post('/messages/:query', async (req, res) => {
 
-//     try {
+    const pageURL = req.params.query;
+    const {token, message} = req.body;
+    console.log( 'voici mes datas : ', pageURL, token, message)
+    try {
+        const projectId = (await Project.findOne({pageURL}))._id;
+        const userPosting = (await User.findOne({token}))._id;
+        const updateMessage = await Project.findByIdAndUpdate(projectId, 
+            {$push: {
+                histories: {
+                    historyType: "chatMessage", 
+                    message, 
+                    date: new Date(), 
+                    userPosting
+                    }
+                }
+            }
+        )
+        if (updateMessage) {
+            const i = (await Project.findById(projectId)).histories.length -1;
+            const updatedMessage = (await Project.findById(projectId)).histories[i];
+            res.json({result: true, message: 'here is your message', updatedMessage});
+        }
 
-//         const {projectId, userPosting, message} = req.body;
-
-//         const updateMessage = await Project.updateOne({projectId}, 
-//             {$push: {
-//                 histories: {
-//                     historyType: "chatMessage", 
-//                     message, 
-//                     date: new Date(), 
-//                     userPosting
-//                     }
-//                 }
-//             }
-//         )
-//         if (updateMessage) {
-//             res.json({result: true, message: 'here is your message', updateMessage});
-//         }
-
-//     } catch (error) {
-//         res.status(403).json({result: false, message: 'cant touch this', error})
-//     }
-// })
+    } catch (error) {
+        res.status(403).json({result: false, message: 'cant touch this', error})
+    }
+})
 
 
 
