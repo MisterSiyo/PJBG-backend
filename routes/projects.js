@@ -67,8 +67,12 @@ router.get('/:query', async (req, res) => {
             path: 'studioValidated',
             model: 'users',
             select: 'studio'
-        })
-        ;
+        });
+
+        if (!project) {
+
+            return res.status(404).json({result: false, message: "No Project Found"})
+        }
 
         await project.populate({
                 path: 'user.fundedProjects.project',
@@ -82,7 +86,20 @@ router.get('/:query', async (req, res) => {
             select: 'title'
     })
 
-        res.json({result: true, messsage: 'here is your project page', project})
+
+    let layoutType = "default";
+        if (project.isChosen && project.isValidatedByStaff) {
+            layoutType = "validated";
+        }
+
+        res.json({
+            result: true,
+            message: 'Here is your project page',
+            project: {
+                ...project.toObject(),
+                layoutType  // On ajoute ce champ au frontend
+            }
+        });
 
     } catch (error) {
         console.log(error)
