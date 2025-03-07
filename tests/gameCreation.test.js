@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('./app');
+const app = require('../app');
 
 it('POST /projects/', async () => {
     const res = await request(app).post('/projects').send({

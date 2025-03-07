@@ -69,11 +69,11 @@ const userFavoritesSchema = new mongoose.Schema({
 const studioSchema = new mongoose.Schema({
     siret: {
         type: String,
-        required: true,
-        index: {
-          unique: true,
-          sparse: true,
-          partialFilterExpression: {siret: {$type: "string"}}
+        required: function(){
+          return this.role === "studio";
+        },
+        unique: function(){
+          return this.role === 'studio';
         }
     },
     siren: {
@@ -82,10 +82,11 @@ const studioSchema = new mongoose.Schema({
     },
     companyName: {
         type: String,
-        index: {
-          unique: true,
-          sparse: true,
-          partialFilterExpression: {companyName: {$type: "string"}}
+        required: function(){
+          return this.role === "studio";
+        },
+        unique: function(){
+          return this.role === 'studio';
         }
     },
     numtva: {
