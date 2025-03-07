@@ -5,15 +5,15 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const cors = require("cors");
-const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken'); // Ajouter jwt pour la vérification du token
+const bodyParser = require("body-parser");
+const jwt = require("jsonwebtoken"); // Ajouter jwt pour la vérification du token
 
 const app = express();
 pjbgDB();
 
 // Middleware pour vérifier l'authentification par token
 const verifyToken = (req, res, next) => {
-  const token = req.cookies.token || req.headers['authorization']; // Vérifier si un token est présent dans les cookies ou les en-têtes
+  const token = req.cookies.token || req.headers["authorization"]; // Vérifier si un token est présent dans les cookies ou les en-têtes
   if (!token) {
     return res.status(401).json({ message: "Veuillez vous connecter." }); // Rediriger vers la connexion si pas de token
   }
@@ -36,7 +36,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-app.use(bodyParser.json());// Middleware pour parser le body
+app.use(bodyParser.json()); // Middleware pour parser le body
 
 const corsOptions = {
   origin: "http://localhost:3001",
@@ -46,6 +46,11 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+// Routes API
+app.use("/api/users", usersRouter);
+app.use("/api/projects", projectsRouter);
+
+// Routes standard (si nécessaire)
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/projects", projectsRouter);
