@@ -34,7 +34,6 @@ describe('Projects API Endpoints', () => {
             progressions: [],
             user: user._id
         });
-        console.log('fini')
         token = user.token;
     });
 
