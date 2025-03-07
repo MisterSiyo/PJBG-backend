@@ -69,12 +69,6 @@ const userFavoritesSchema = new mongoose.Schema({
 const studioSchema = new mongoose.Schema({
     siret: {
         type: String,
-        required: function(){
-          return this.role === "studio";
-        },
-        unique: function(){
-          return this.role === 'studio';
-        }
     },
     siren: {
         type: String,
@@ -82,12 +76,6 @@ const studioSchema = new mongoose.Schema({
     },
     companyName: {
         type: String,
-        required: function(){
-          return this.role === "studio";
-        },
-        unique: function(){
-          return this.role === 'studio';
-        }
     },
     numtva: {
         type: String,
@@ -183,7 +171,6 @@ const userSchema = new mongoose.Schema(
     address: [adressSchema],
     phone: {
       type: String,
-      unique: true,
     },
     description: {  
       type: String,
