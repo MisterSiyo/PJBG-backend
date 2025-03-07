@@ -42,7 +42,7 @@ router.get('/:query', async (req, res) => {
         .select('-__v')
         .populate({
             path:'user',
-            select: 'username role followedProjects fundedProjects -_id'
+            select: 'username description role followedProjects fundedProjects -_id'
         })
         .populate({
             path: 'detail.pledges', 
