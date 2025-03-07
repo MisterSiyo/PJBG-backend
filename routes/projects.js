@@ -4,6 +4,43 @@ const Project = require('../models/projects');
 const User = require('../models/users');
 const Pledge = require('../models/pledges');
 
+
+router.post('/update/:id', async (req, res) => {
+    const { title, content, token } = req.body;
+console.log(req.body)
+    try {
+        const studio = await User.findOne({ token });
+        console.log("studio:", studio)
+
+        if (!studio || studio.role !== "studio") {
+            return res.status(403).json({ message: "Unauthorized. Only studios can post updates." });
+        }
+
+        const project = await Project.findById(req.params.id);
+        console.log("project:", project)
+
+        if (!project) {
+            return res.status(404).json({ message: "Project not found." });
+        }
+        const newUpdate = {
+            stageId: project.stages?.length + 1 || 1,
+            title,
+            content,
+            imagesURL: []
+        };
+        console.log("newUpdate:", newUpdate)
+
+        await project.updateOne({$push: {stages: newUpdate}});
+        // project.updateOne() finOnebyIdandupdate (asynchrone) $where ? cherche le stage qu'il faut update, puis lui attribuer la valeur 
+
+        
+
+        res.status(200).json({ message: "Update added successfully!", project });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error });
+    }
+});
+
 // route qui envoie le catalogue complet au front-end 
 router.get('/get/all', async (req, res) => { // !!!! attention, je n'ai pas filtré par catégories de user, donc à voir ou on fait ça, front ou back
     try {
