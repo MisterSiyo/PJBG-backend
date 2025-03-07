@@ -188,6 +188,7 @@ router.post("/login", async (req, res) => {
       surname: user.surname,
       description: user.description,
       address: user.address,
+      studio: user.studio,
       socialLinks: user.socialLinks,
       followedProjects: user.followedProjects,
       createdProjects: user.createdProjects,
