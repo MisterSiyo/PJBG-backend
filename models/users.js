@@ -70,7 +70,11 @@ const studioSchema = new mongoose.Schema({
     siret: {
         type: String,
         required: true,
-        unique: true,
+        index: {
+          unique: true,
+          sparse: true,
+          partialFilterExpression: {siret: {$type: "string"}}
+        }
     },
     siren: {
         type: String,
@@ -78,8 +82,11 @@ const studioSchema = new mongoose.Schema({
     },
     companyName: {
         type: String,
-        required: true,
-        unique: true,
+        index: {
+          unique: true,
+          sparse: true,
+          partialFilterExpression: {companyName: {$type: "string"}}
+        }
     },
     numtva: {
         type: String,
