@@ -70,9 +70,22 @@ router.get('/:query', async (req, res) => {
         })
         ;
 
+        await project.populate({
+                path: 'user.fundedProjects.project',
+                model: 'projects',
+                select: 'title'
+        })
+
+        await project.populate({
+            path: 'user.followedProjects.project',
+            model: 'projects',
+            select: 'title'
+    })
+
         res.json({result: true, messsage: 'here is your project page', project})
 
     } catch (error) {
+        console.log(error)
         res.status(403).json({result: false, message: 'no project of this name', error})
     }
 });
