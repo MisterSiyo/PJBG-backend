@@ -18,6 +18,12 @@ const gameMechanicSchema = new mongoose.Schema( // les champs en commentaires so
         },
         GMType: {
             type: String,
+        },
+        color: {
+            type: String,
+        },
+        color2: {
+            type: String,
         }
     }
 );

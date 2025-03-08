@@ -37,4 +37,19 @@ router.get('/characteristics', async (req, res) => {
   }
 });
 
+router.get('/genres', async (req, res) => {
+
+  try {
+    const genres = await GameMechanic.find({GMType: "genre"});
+    return res.status(200).json({result: true, genres})
+
+
+
+  } catch(error) {
+    res.status(400).json({result: false, message: 'error on checking genres'})
+  }
+
+
+})
+
 module.exports = router;
