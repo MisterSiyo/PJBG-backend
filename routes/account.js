@@ -30,7 +30,7 @@ router.get('/', async(req, res) => {  // Route GET pour récupérer les informat
 router.put('/', (req, res) => {  // Route PUT pour mettre à jour les informations d'un utilisateur
 
     console.log(req.body)
-    const { token, email, phone, name, surname, description, address, socialLinks, userFavorites, fundedProjects, followedProjects, createdProjects } = req.body;  // Déstructuration des champs reçus dans la requête
+    const { token, email, phone, name, surname, description, address, studio, socialLinks, userFavorites, fundedProjects, followedProjects, createdProjects } = req.body;  // Déstructuration des champs reçus dans la requête
 
     // Met à jour les informations de l'utilisateur en fonction du token
     User.findOneAndUpdate({token}, {email, phone, name, surname, description, address, socialLinks, userFavorites, fundedProjects, followedProjects, createdProjects, studio}, { new: true })  // Recherche un utilisateur avec le token et met à jour ses informations

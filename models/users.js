@@ -72,7 +72,6 @@ const studioSchema = new mongoose.Schema({
     },
     siren: {
         type: String,
-        required: true,
     },
     companyName: {
         type: String,
@@ -107,8 +106,8 @@ const studioSchema = new mongoose.Schema({
     subBrand: {
         type: String, 
     },
-    contactPerson: [contactPersonSchema],
-    contactManager: [contactManagerSchema],
+    contactPerson: contactPersonSchema,
+    contactManager: contactManagerSchema,
 
     address: {
         streetNumber: { type: String },
@@ -135,6 +134,19 @@ const studioSchema = new mongoose.Schema({
 // Schéma des users (= studios + backers)
 const userSchema = new mongoose.Schema(
   {
+    googleId: {
+      type: String,
+      sparse: true,
+      index: true,
+    },
+    picture: {
+      type: String,
+    },
+    authType: {
+      type: String,
+      enum: ['local', 'google', 'reddit'],
+      default: 'local',
+    },
     studio: studioSchema,
     username: {
       type: String,
@@ -149,8 +161,9 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
-      minlength: 6,
+      required: function () {
+        return this.authType === 'local';
+      },
     },
     token: {
       type: String,
@@ -160,6 +173,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["patron", "studio"], // Se renseigne automatiquement en focntion de la création de compte
       required: true,
+      default: 'patron',
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    lastLogin: {
+      type: Date,
+      default: Date.now,
     },
     socialLinks: [socialLinksSchema],
     name: {
@@ -168,7 +190,7 @@ const userSchema = new mongoose.Schema(
     surname: {
       type: String,
     },
-    address: [adressSchema],
+    address: adressSchema,
     phone: {
       type: String,
     },

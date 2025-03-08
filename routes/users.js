@@ -4,7 +4,7 @@ const uid2 = require("uid2");
 const fetch = require("node-fetch");
 const jwt = require("jsonwebtoken");
 
-const User = require("../models/user");
+const User = require("../models/users");
 const router = express.Router();
 
 const API_BASE_URL = "https://api.societe.com/api/v1";
@@ -387,7 +387,7 @@ router.post("/google-auth", async (req, res) => {
     );
 
     // Renvoyer les informations utilisateur et le token
-    res.status(200).json({
+    res.status(200).json({ // !!!!                                    A CORRRIGER CECI N EST PAS CONFORME PROTECTION ET RENVOIT AUSSI UNE ERREUR FORCEMENT
       message:
         user.createdAt === user.updatedAt
           ? "Utilisateur créé"
@@ -461,7 +461,7 @@ router.post("/reddit-auth", async (req, res) => {
     }
 
     // Retourner les informations utilisateur et le token
-    return res.status(200).json({
+    return res.status(200).json({ // !!!!                                    A CORRRIGER CECI N EST PAS CONFORME PROTECTION ET RENVOIT AUSSI UNE ERREUR FORCEMENT
       success: true,
       user: {
         id: user._id,
@@ -507,7 +507,7 @@ router.get("/me", async (req, res) => {
     }
 
     // Renvoyer les informations utilisateur
-    return res.status(200).json({
+    return res.status(200).json({ // !!!!                                    A CORRRIGER CECI N EST PAS CONFORME PROTECTION ET RENVOIT AUSSI UNE ERREUR FORCEMENT
       success: true,
       user: {
         id: user._id,
