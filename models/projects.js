@@ -42,6 +42,12 @@ const stageSchema = mongoose.Schema({
         type: String,
         required: [true, 'a content is required for your update']
     },
+    roadmapUpdate: {
+        type: String,
+        required: [true, 'your roadmap needs to be updated']
+    }, 
+    communityEngagement: String,
+    closingNotes: String, 
     imagesURL: [{
         type: String,
         default: '', // !!! définir une image bidon en default
