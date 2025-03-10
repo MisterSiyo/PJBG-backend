@@ -23,9 +23,7 @@ const formatCompanyInfo = (data) => ({
   status: data.catjurlibinsee || "N/A",
   address: {
     streetNumber: data.numvoieinsee,
-    street: `${data.typvoieinsee || ""} ${
-      data.libvoieinsee || ""
-    }`.trim(),
+    street: `${data.typvoieinsee || ""} ${data.libvoieinsee || ""}`.trim(),
     postalCode: data.codepostalinsee || "N/A",
     city: data.villeinsee || "N/A",
     country: data.paysinsee || "N/A",
@@ -101,9 +99,7 @@ router.post("/register", async (req, res) => {
     }
 
     if (role === "studio" && (!companyInfo || !companyInfo.address)) {
-      return res
-        .status(400)
-        .json({ message: "Siret is required." });
+      return res.status(400).json({ message: "Siret is required." });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const token = uid2(32);
@@ -146,21 +142,21 @@ router.post("/register", async (req, res) => {
         website: "",
         description: "",
         brand: "",
-        subBrand: '',
+        subBrand: "",
         contactPerson: {
           name: "",
           surname: "",
           email: "",
-          phone: ""
+          phone: "",
         },
         contactManager: {
           name: "",
           surname: "",
           email: "",
-          phone: ""
+          phone: "",
         },
         chosenProjects: [],
-        developpedProjects: []
+        developpedProjects: [],
       };
     }
 
@@ -199,30 +195,29 @@ router.post("/login", async (req, res) => {
       user = await User.findOne({ username });
     }
 
-    if (user.fundedProjects.length > 0 ) {
-      console.log('funded if')
+    if (user.fundedProjects.length > 0) {
+      console.log("funded if");
       await user.populate({
-        path: 'fundedProjects.project',
-        model: 'projects',
-      })
+        path: "fundedProjects.project",
+        model: "projects",
+      });
     }
-   
-    if (user.followedProjects.length > 0 ) {
-      console.log('followed if')
+
+    if (user.followedProjects.length > 0) {
+      console.log("followed if");
       await user.populate({
-        path: 'followedProjects',
-        model: 'projects'
-      })
+        path: "followedProjects",
+        model: "projects",
+      });
     }
-    
-    if (user.createdProjects.length > 0 ) {
-      console.log('created if')
+
+    if (user.createdProjects.length > 0) {
+      console.log("created if");
       await user.populate({
-        path: 'createdProjects',
-        model: 'projects'
-      })
+        path: "createdProjects",
+        model: "projects",
+      });
     }
-    
 
     if (!user) {
       return res.status(400).json({ message: "User not found" });
@@ -429,7 +424,8 @@ router.post("/google-auth", async (req, res) => {
     );
 
     // Renvoyer les informations utilisateur et le token
-    res.status(200).json({ // !!!!                                    A CORRRIGER CECI N EST PAS CONFORME PROTECTION ET RENVOIT AUSSI UNE ERREUR FORCEMENT
+    res.status(200).json({
+      // !!!!                                    A CORRRIGER CECI N EST PAS CONFORME PROTECTION ET RENVOIT AUSSI UNE ERREUR FORCEMENT
       message:
         user.createdAt === user.updatedAt
           ? "Utilisateur créé"
@@ -503,7 +499,8 @@ router.post("/reddit-auth", async (req, res) => {
     }
 
     // Retourner les informations utilisateur et le token
-    return res.status(200).json({ // !!!!                                    A CORRRIGER CECI N EST PAS CONFORME PROTECTION ET RENVOIT AUSSI UNE ERREUR FORCEMENT
+    return res.status(200).json({
+      // !!!!                                    A CORRRIGER CECI N EST PAS CONFORME PROTECTION ET RENVOIT AUSSI UNE ERREUR FORCEMENT
       success: true,
       user: {
         id: user._id,
@@ -549,7 +546,8 @@ router.get("/me", async (req, res) => {
     }
 
     // Renvoyer les informations utilisateur
-    return res.status(200).json({ // !!!!                                    A CORRRIGER CECI N EST PAS CONFORME PROTECTION ET RENVOIT AUSSI UNE ERREUR FORCEMENT
+    return res.status(200).json({
+      // !!!!                                    A CORRRIGER CECI N EST PAS CONFORME PROTECTION ET RENVOIT AUSSI UNE ERREUR FORCEMENT
       success: true,
       user: {
         id: user._id,
@@ -563,6 +561,72 @@ router.get("/me", async (req, res) => {
   } catch (error) {
     console.error("Erreur lors de la récupération de l'utilisateur:", error);
     return res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+});
+
+// Route pour ajouter/retirer un projet des projets suivis
+router.post("/toggleFollow", async (req, res) => {
+  try {
+    // Récupérer le token depuis l'entête d'autorisation
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Vous devez être connecté",
+      });
+    }
+
+    // Récupérer l'ID du projet à ajouter/retirer
+    const { projectId } = req.body;
+
+    if (!projectId) {
+      return res.status(400).json({
+        success: false,
+        message: "ID du projet manquant",
+      });
+    }
+
+    // Trouver l'utilisateur grâce au token
+    const user = await User.findOne({ token });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Utilisateur non trouvé",
+      });
+    }
+
+    // Vérifier si le projet est déjà suivi
+    const projectIndex = user.followedProjects.indexOf(projectId);
+
+    // Ajouter ou retirer le projet des projets suivis
+    if (projectIndex > -1) {
+      // Le projet est déjà suivi, on le retire
+      user.followedProjects.splice(projectIndex, 1);
+    } else {
+      // Le projet n'est pas encore suivi, on l'ajoute
+      user.followedProjects.push(projectId);
+    }
+
+    // Sauvegarder les modifications
+    await user.save();
+
+    // Répondre avec la liste mise à jour des projets suivis
+    return res.status(200).json({
+      success: true,
+      message:
+        projectIndex > -1
+          ? "Projet retiré des favoris"
+          : "Projet ajouté aux favoris",
+      followedProjects: user.followedProjects,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour des projets suivis:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erreur serveur lors de la mise à jour des projets suivis",
+    });
   }
 });
 

@@ -67,68 +67,68 @@ const userFavoritesSchema = new mongoose.Schema({
 
 // Schéma des infos spécifiques aux studios (=sous document de user)
 const studioSchema = new mongoose.Schema({
-    siret: {
-        type: String,
-    },
-    siren: {
-        type: String,
-    },
-    companyName: {
-        type: String,
-    },
-    numtva: {
-        type: String,
-    },
-    naf: {
-        type: String,
-    },
-    rcs: {
-        type: String,
-    },
-    greffe: {
-        type: String,
-    },
-    capital: {
-        type: String,
-    },
-    status: {
-        type: String,
-    },
-    webSite: {
-        type: String, 
-    },
-    description: {
-        type: String, 
-    },
-    brand: {
-        type: String, 
-    },
-    subBrand: {
-        type: String, 
-    },
-    contactPerson: contactPersonSchema,
-    contactManager: contactManagerSchema,
+  siret: {
+    type: String,
+  },
+  siren: {
+    type: String,
+  },
+  companyName: {
+    type: String,
+  },
+  numtva: {
+    type: String,
+  },
+  naf: {
+    type: String,
+  },
+  rcs: {
+    type: String,
+  },
+  greffe: {
+    type: String,
+  },
+  capital: {
+    type: String,
+  },
+  status: {
+    type: String,
+  },
+  webSite: {
+    type: String,
+  },
+  description: {
+    type: String,
+  },
+  brand: {
+    type: String,
+  },
+  subBrand: {
+    type: String,
+  },
+  contactPerson: contactPersonSchema,
+  contactManager: contactManagerSchema,
 
-    address: {
-        streetNumber: { type: String },
-        street: { type: String },
-        postalCode: { type: String },
-        city: { type: String },
-        country: { type: String },
-    },
+  address: {
+    streetNumber: { type: String },
+    street: { type: String },
+    postalCode: { type: String },
+    city: { type: String },
+    country: { type: String },
+  },
 
-    chosenProjects: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "projects",
-        },
-    ],
-    developedProjects: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "projects",
-        },
-    ],
+  chosenProjects: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "projects",
+    },
+  ],
+  developedProjects: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "projects",
+    },
+  ],
 });
 
 // Schéma des users (= studios + backers)
@@ -144,8 +144,8 @@ const userSchema = new mongoose.Schema(
     },
     authType: {
       type: String,
-      enum: ['local', 'google', 'reddit'],
-      default: 'local',
+      enum: ["local", "google", "reddit"],
+      default: "local",
     },
     studio: studioSchema,
     username: {
@@ -162,7 +162,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: function () {
-        return this.authType === 'local';
+        return this.authType === "local";
       },
     },
     token: {
@@ -173,7 +173,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["patron", "studio"], // Se renseigne automatiquement en focntion de la création de compte
       required: true,
-      default: 'patron',
+      default: "patron",
     },
     isActive: {
       type: Boolean,
@@ -194,7 +194,7 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
     },
-    description: {  
+    description: {
       type: String,
     },
     fundedProjects: [fundedProjectsSchema], // Liste des projets financé par l'utilisateur
@@ -215,11 +215,11 @@ const userSchema = new mongoose.Schema(
 );
 
 // Vérification : studioInfo obligatoire si role = "studio"
-userSchema.pre('save', function (next) {
-    if (this.role === 'studio' && !this.studio) {
-        return next(new Error('Les studios doivent avoir un studioInfo rempli.'));
-    }
-    next();
+userSchema.pre("save", function (next) {
+  if (this.role === "studio" && !this.studio) {
+    return next(new Error("Les studios doivent avoir un studioInfo rempli."));
+  }
+  next();
 });
 
 const User = mongoose.model("users", userSchema);
