@@ -102,7 +102,7 @@ router.post("/register", async (req, res) => {
     if (role === "studio" && (!companyInfo || !companyInfo.address)) {
       return res
         .status(400)
-        .json({ message: "Address is required for studios." });
+        .json({ message: "Siret is required." });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const token = uid2(32);
