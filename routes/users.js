@@ -199,6 +199,31 @@ router.post("/login", async (req, res) => {
       user = await User.findOne({ username });
     }
 
+    if (user.fundedProjects.length > 0 ) {
+      console.log('funded if')
+      await user.populate({
+        path: 'fundedProjects.project',
+        model: 'projects',
+      })
+    }
+   
+    if (user.followedProjects.length > 0 ) {
+      console.log('followed if')
+      await user.populate({
+        path: 'followedProjects',
+        model: 'projects'
+      })
+    }
+    
+    if (user.createdProjects.length > 0 ) {
+      console.log('created if')
+      await user.populate({
+        path: 'createdProjects',
+        model: 'projects'
+      })
+    }
+    
+
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
