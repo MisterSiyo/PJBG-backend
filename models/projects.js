@@ -44,7 +44,6 @@ const stageSchema = mongoose.Schema({
     },
     roadmapUpdate: {
         type: String,
-        required: [true, 'your roadmap needs to be updated']
     }, 
     communityEngagement: String,
     closingNotes: String, 
