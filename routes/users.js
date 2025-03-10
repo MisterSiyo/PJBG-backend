@@ -22,7 +22,8 @@ const formatCompanyInfo = (data) => ({
   capital: data.capital ? `${data.capital} ${data.libdevise}` : "N/A",
   status: data.catjurlibinsee || "N/A",
   address: {
-    street: `${data.numvoieinsee || ""} ${data.typvoieinsee || ""} ${
+    streetNumber: data.numvoieinsee,
+    street: `${data.typvoieinsee || ""} ${
       data.libvoieinsee || ""
     }`.trim(),
     postalCode: data.codepostalinsee || "N/A",
@@ -142,6 +143,24 @@ router.post("/register", async (req, res) => {
         capital: formattedCompany.capital,
         status: formattedCompany.status,
         address: formattedCompany.address,
+        website: "",
+        description: "",
+        brand: "",
+        subBrand: '',
+        contactPerson: {
+          name: "",
+          surname: "",
+          email: "",
+          phone: ""
+        },
+        contactManager: {
+          name: "",
+          surname: "",
+          email: "",
+          phone: ""
+        },
+        chosenProjects: [],
+        developpedProjects: []
       };
     }
 
@@ -205,8 +224,6 @@ router.post("/login", async (req, res) => {
       followedProjects: user.followedProjects,
       createdProjects: user.createdProjects,
       fundedProjects: user.fundedProjects,
-      appliedProjects: user.appliedProjects,
-      developpedProjects: user.developpedProjects,
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
