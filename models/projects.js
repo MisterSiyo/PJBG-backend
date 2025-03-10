@@ -31,6 +31,12 @@ const progressionSchema = mongoose.Schema({
     isPledgePayed: Boolean,
    });
 
+   const updateSchema = mongoose.Schema({
+    category: String, 
+    contentUpdate: String },
+    {timestamps: true},
+   )
+
 // gère l'historique du développement du projet
 const stageSchema = mongoose.Schema({
     stageId: Number,
@@ -42,10 +48,10 @@ const stageSchema = mongoose.Schema({
         type: String,
         required: [true, 'a content is required for your update']
     },
+    progressUpdate: [updateSchema],
     roadmapUpdate: {
         type: String,
     }, 
-    communityEngagement: String,
     closingNotes: String, 
     imagesURL: [{
         type: String,
