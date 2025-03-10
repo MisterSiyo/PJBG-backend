@@ -6,18 +6,18 @@ const Pledge = require('../models/pledges');
 
 
 router.post('/update/:id', async (req, res) => {
-    const { title, content, token } = req.body;
-console.log(req.body)
+    const { title, category, content, roadmapUpdate, communityEngagement, closingNotes, token } = req.body;
+// console.log(req.body)
     try {
         const studio = await User.findOne({ token });
-        console.log("studio:", studio)
+        // console.log("studio:", studio)
 
         if (!studio || studio.role !== "studio") {
             return res.status(403).json({ message: "Unauthorized. Only studios can post updates." });
         }
 
         const project = await Project.findById(req.params.id);
-        console.log("project:", project)
+        // console.log("project:", project)
 
         if (!project) {
             return res.status(404).json({ message: "Project not found." });
@@ -25,10 +25,14 @@ console.log(req.body)
         const newUpdate = {
             stageId: project.stages?.length + 1 || 1,
             title,
+            category,
             content,
+            roadmapUpdate,
+            communityEngagement,
+            closingNotes,
             imagesURL: []
         };
-        console.log("newUpdate:", newUpdate)
+        // console.log("newUpdate:", newUpdate)
 
         await project.updateOne({$push: {stages: newUpdate}});
         // project.updateOne() finOnebyIdandupdate (asynchrone) $where ? cherche le stage qu'il faut update, puis lui attribuer la valeur 
