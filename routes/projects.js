@@ -64,6 +64,15 @@ router.get('/get/all', async (req, res) => { // !!!! attention, je n'ai pas filt
             path: 'histories.userPosting',
             select: 'username role'
         })
+        .populate({
+            path: 'progressions.userContributing',
+            model: 'users',
+            select: 'username -_id'
+        })
+        .populate({
+            path: 'progressions.pledgeChosen',
+            model: 'Pledges',
+        })
         ;
         res.status(200).json({result: true, message: 'here are your results', projectsData});
         
@@ -98,13 +107,23 @@ router.get('/:query', async (req, res) => {
         .populate({
             path: 'studiosPreVote',
             model: 'users',
-            select: 'studio'
+            select: 'studio.companyName studio.description'
         })
         .populate({
             path: 'studioValidated',
             model: 'users',
-            select: 'studio'
-        });
+            select: 'studio.companyName studio.description'
+        })
+        .populate({
+            path: 'progressions.userContributing',
+            model: 'users',
+            select: 'username -_id'
+        })
+        .populate({
+            path: 'progressions.pledgeChosen',
+            model: 'Pledges',
+        })
+        ;
 
         if (!project) {
 
@@ -267,6 +286,31 @@ router.post('/messages/:query', async (req, res) => {
     }
 })
 
+router.put('/dev', async (req, res) => {
 
+    const {projectId, token} = req.body;
+
+    try {
+
+        const user = await User.findOne({token});
+
+        if (user.role !== 'studio') {
+            return res.json({result: false, message: 'authorization denied'})
+        }
+
+        const projectUpdated = await Project.findByIdAndUpdate(projectId, {
+            $push: { studiosPreVote: user._id
+        }})
+        res.json({result: true, projectUpdated})
+
+    } catch (error) {
+        res.status(400).json({result: false, error})
+    }
+})
+
+router.put('/vote', async (req, res) => {
+
+
+})
 
 module.exports = router;
