@@ -220,6 +220,10 @@ router.post('/', async (req, res) => {
             path: 'histories.userPosting',
             select: 'username role'
         });
+
+        await User.findOneAndUpdate({token}, {
+            $push: {createdProjects: newCreatedProject._id}
+        })
         
         res.json({result: true, message: 'project created with success', newCreatedProject})
     } catch (error) {
