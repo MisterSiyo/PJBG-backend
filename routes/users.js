@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/users");
 const router = express.Router();
+const Project = require('../models/projects')
 
 const API_BASE_URL = "https://api.societe.com/api/v1";
 const API_KEY = process.env.CLE_API_SOCIETE;
@@ -599,28 +600,36 @@ router.post("/toggleFollow", async (req, res) => {
 
     // Vérifier si le projet est déjà suivi
     const projectIndex = user.followedProjects.indexOf(projectId);
-
+    const project = Project.findById(projectId);
     // Ajouter ou retirer le projet des projets suivis
     if (projectIndex > -1) {
       // Le projet est déjà suivi, on le retire
       user.followedProjects.splice(projectIndex, 1);
+      await user.save();
+      await user.populate({path: "followedProjects", model: "projects"})
+      return res.status(200).json({success: true, message: "projet retiré des favoris", followedProjects: user.followedProjects})
+
     } else {
       // Le projet n'est pas encore suivi, on l'ajoute
       user.followedProjects.push(projectId);
+      await user.save()
+      await user.populate({path: "followedProjects", model: 'projects'})
+      return res.status(200).json({success: true, message: "projet ajouté aux favoris", followedProjects: user.followedProjects})
     }
 
-    // Sauvegarder les modifications
-    await user.save();
+    // // Sauvegarder les modifications
+    // await user.save();
 
-    // Répondre avec la liste mise à jour des projets suivis
-    return res.status(200).json({
-      success: true,
-      message:
-        projectIndex > -1
-          ? "Projet retiré des favoris"
-          : "Projet ajouté aux favoris",
-      followedProjects: user.followedProjects,
-    });
+    // // Répondre avec la liste mise à jour des projets suivis
+    // return res.status(200).json({
+    //   success: true,
+    //   message:
+    //     projectIndex > -1
+    //       ? "Projet retiré des favoris"
+    //       : "Projet ajouté aux favoris",
+    //   followedProjects: user.followedProjects,
+    //   newproject: project
+    // });
   } catch (error) {
     console.error("Erreur lors de la mise à jour des projets suivis:", error);
     return res.status(500).json({
