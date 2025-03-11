@@ -7,7 +7,7 @@ const Pledge = require('../models/pledges');
 
 router.post('/update/:id', async (req, res) => {
     // On récupère "token" (et plus "userAccount") pour éviter la confusion
-    const { title, category, content, roadmapUpdate, communityEngagement, closingNotes, token } = req.body;
+    const { title, update, monthUpdate, roadmapUpdate, closingNotes, token } = req.body;
   
     try {
       // On retrouve le studio grâce au token
@@ -27,10 +27,9 @@ router.post('/update/:id', async (req, res) => {
       const newUpdate = {
         stageId: (project.stages?.length || 0) + 1,
         title,
-        category,
-        content,
+        monthUpdate,
+        update,
         roadmapUpdate,
-        communityEngagement,
         closingNotes,
         imagesURL: []
         // pas besoin de stocker "token" dans le stage lui-même, sauf cas particulier
@@ -268,7 +267,7 @@ router.post('/messages/:query', async (req, res) => {
 
     const pageURL = req.params.query;
     const {token, message} = req.body;
-    console.log( 'voici mes datas : ', pageURL, token, message)
+    // console.log( 'voici mes datas : ', pageURL, token, message)
     try {
         const projectId = (await Project.findOne({pageURL}))._id;
         const userPosting = (await User.findOne({token}))._id;
