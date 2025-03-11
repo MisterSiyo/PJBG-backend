@@ -220,13 +220,13 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    if (user.studio.chosenProjects.length > 0) {
+    if (user.studio?.chosenProjects.length > 0) {
       await user.populate({
         path: 'studio.chosenProjects', 
         model: 'projects'})
     }
 
-    if (user.studio.developedProjects.length > 0) {
+    if (user.studio?.developedProjects.length > 0) {
       await user.populate({
         path: 'studio.developedProjects', 
         model: 'projects'})
