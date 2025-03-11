@@ -64,10 +64,11 @@ const stageSchema = mongoose.Schema({
    },
    { timestamps: true }
 );
-
+// project.studiosPreVote =>
 const studioPreVoteSchema = mongoose.Schema({
     studio: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
-    votes : [{type: mongoose.Schema.Types.ObjectId, ref: 'users'}]
+    votes : [{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
+    winner: {type: Boolean, default : false}
 })
 
 // la collection ci-dessous

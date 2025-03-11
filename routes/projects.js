@@ -109,7 +109,7 @@ router.get('/:query', async (req, res) => {
             select: 'username role'
         })
         .populate({
-            path: 'studiosPreVote',
+            path: 'studiosPreVote.studio',
             model: 'users',
             select: 'studio.companyName studio.description'
         })
@@ -375,8 +375,18 @@ router.put('/dev', async (req, res) => {
             return res.json({result: false, message: 'authorization denied'})
         }
 
+        const isAlreadyDev = await Project.findOne({_id: projectId, "studiosPreVote.studio": user._id})
+        
+        if (isAlreadyDev) {
+            res.json({result: false, message: 'you already develop this project'})
+        }
+
         const projectUpdated = await Project.findByIdAndUpdate(projectId, { isChosen: true,
-            $push: { studiosPreVote: user._id
+            $push: { studiosPreVote: {
+                studio: user._id,
+                votes: [],
+                winner: false,
+            }
         }})
 
         await User.findOneAndUpdate({token}, {
@@ -410,7 +420,7 @@ router.put('/validate', async (req, res) => {
     try {
 
         await Project.findByIdAndUpdate(projectId, {
-        studioValidated: userId, isValidatedByStaff: true, dateOfValidation : new Date(),
+        studioValidated: userId, isValidatedByStaff: true, dateOfValidation : new Date(), isVisible: false,
     });
 
     await User.findByIdAndUpdate(userId, {
