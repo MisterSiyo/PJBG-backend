@@ -17,7 +17,7 @@ const verifyToken = (req, res, next) => {
   if (!token) {
     return res.status(401).json({ message: "Veuillez vous connecter." }); // Rediriger vers la connexion si pas de token
   }
-
+  
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Vérifier la validité du token
     req.user = decoded; // Stocker les informations utilisateur dans req.user
@@ -37,6 +37,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.json()); // Middleware pour parser le body
+
 
 const corsOptions = {
   origin: "http://localhost:3001",
