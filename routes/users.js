@@ -196,43 +196,7 @@ router.post("/login", async (req, res) => {
       user = await User.findOne({ username });
     }
 
-    if (user.fundedProjects.length > 0) {
-      console.log("funded if");
-      await user.populate({
-        path: "fundedProjects.project",
-        model: "projects",
-      });
-    }
-
-    if (user.followedProjects.length > 0) {
-      console.log("followed if");
-      await user.populate({
-        path: "followedProjects",
-        model: "projects",
-      });
-    }
-
-    if (user.createdProjects.length > 0) {
-      console.log("created if");
-      await user.populate({
-        path: "createdProjects",
-        model: "projects",
-      });
-    }
-
-    if (user.studio?.chosenProjects.length > 0) {
-      await user.populate({
-        path: 'studio.chosenProjects', 
-        model: 'projects'})
-    }
-
-    if (user.studio?.developedProjects.length > 0) {
-      await user.populate({
-        path: 'studio.developedProjects', 
-        model: 'projects'})
-    }
-
-
+    
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
@@ -241,6 +205,73 @@ router.post("/login", async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: "Incorrect password" });
     }
+
+    if (user.fundedProjects.length > 0) {
+      console.log("funded if");
+      await user.populate({
+        path: "fundedProjects.project",
+        model: "projects",
+      })
+
+      // .populate({path: 'fundedProjects.project.progressions.pledgeChosen',
+      //   model: 'Pledges'
+      // }).populate({path: 'fundedProjects.project.detail.gameMechanics',
+      //   model: 'gameMechanics'
+      // })
+      // ;
+    }
+
+    if (user.followedProjects.length > 0) {
+      console.log("followed if");
+      await user.populate({
+        path: "followedProjects",
+        model: "projects",
+      })
+      // .populate({path: 'followedProjects.progressions.pledgeChosen',
+      //   model: 'Pledges'
+      // }).populate({path: 'followedProjects.detail.gameMechanics',
+      //   model: 'gameMechanics'
+      // })
+      ;
+    }
+
+    if (user.createdProjects.length > 0) {
+      console.log("created if");
+      await user.populate({
+        path: "createdProjects",
+        model: "projects",
+      })
+      // .populate({path: 'createdProjects.progressions.pledgeChosen',
+      //   model: 'Pledges'
+      // }).populate({path: 'createdProjects.detail.gameMechanics',
+      //   model: 'gameMechanics'
+      // })
+      ;
+    }
+
+    if (user.studio?.chosenProjects.length > 0) {
+      await user.populate({
+        path: 'studio.chosenProjects', 
+        model: 'projects'})
+        // .populate({path: 'studio.chosenProjects.progressions.pledgeChosen',
+        //   model: 'Pledges'
+        // }).populate({path: 'studio.chosenProjects.detail.gameMechanics',
+        //   model: 'gameMechanics'
+        // })
+    }
+
+    if (user.studio?.developedProjects.length > 0) {
+      await user.populate({
+        path: 'studio.developedProjects', 
+        model: 'projects'})
+        // .populate({path: 'studio.developedProjects.progressions.pledgeChosen',
+        //   model: 'Pledges'
+        // }).populate({path: 'studio.developedProjects.detail.gameMechanics',
+        //   model: 'gameMechanics'
+        // })
+    }
+
+
 
     res.status(200).json({
       message: "Connection successful",
@@ -651,5 +682,21 @@ router.post("/toggleFollow", async (req, res) => {
     });
   }
 });
+
+router.post('/reduxrender', async (req, res) => {
+
+  const {token} = req.body;
+try {
+  const user = await User.findOne({token});
+
+  res.status(200).json({result: true, user})
+
+} catch (error) {
+  res.status(400).json({result: false, error})
+}
+
+})
+
+
 
 module.exports = router;

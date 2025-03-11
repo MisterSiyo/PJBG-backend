@@ -113,6 +113,11 @@ router.get('/:query', async (req, res) => {
             select: 'studio.companyName studio.description'
         })
         .populate({
+            path: 'studiosPreVote.votes',
+            model: 'users',
+            select: 'username -_id'
+        })
+        .populate({
             path: 'studioValidated',
             model: 'users',
             select: 'studio.companyName studio.description'
