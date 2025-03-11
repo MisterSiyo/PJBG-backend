@@ -192,7 +192,7 @@ router.post('/', async (req, res) => {
                 historyType: 'news',
                 message: "Congratulations on creating your project !",
                 date: new Date(),
-                userPosting: '67cad3726d55ed756004f14b'
+                userPosting: '67cff4179d0f465cf51b6cc2'
             }],
             progressions: [],
             stages: [],
