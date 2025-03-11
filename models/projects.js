@@ -44,11 +44,11 @@ const stageSchema = mongoose.Schema({
         type: String,
         required: [true, 'a title is required for your update']
     },
-    content: {
+    monthUpdate: {
         type: String,
         required: [true, 'a content is required for your update']
     },
-    progressUpdate: [updateSchema],
+    update: [updateSchema],
     roadmapUpdate: {
         type: String,
     }, 
