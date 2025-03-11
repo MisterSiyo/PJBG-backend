@@ -220,6 +220,19 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    if (user.studio.chosenProjects.length > 0) {
+      await user.populate({
+        path: 'studio.chosenProjects', 
+        model: 'projects'})
+    }
+
+    if (user.studio.developedProjects.length > 0) {
+      await user.populate({
+        path: 'studio.developedProjects', 
+        model: 'projects'})
+    }
+
+
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }

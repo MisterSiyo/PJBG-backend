@@ -306,17 +306,55 @@ router.put('/dev', async (req, res) => {
             return res.json({result: false, message: 'authorization denied'})
         }
 
-        const projectUpdated = await Project.findByIdAndUpdate(projectId, {
+        const projectUpdated = await Project.findByIdAndUpdate(projectId, { isChosen: true,
             $push: { studiosPreVote: user._id
         }})
+
+        await User.findOneAndUpdate({token}, {
+            $push: {"studio.chosenProjects": projectId
+            }
+        }, {new: true}
+
+        
+    )
+
+    if (projectUpdated.studiosPreVote.length > 1) {
+        res.json({result: true, projectUpdated})    
+    } else {
+
+        await Project.findByIdAndUpdate(projectId, {dateOfChoosing: new Date()})
+
+
         res.json({result: true, projectUpdated})
+    }
+       
 
     } catch (error) {
         res.status(400).json({result: false, error})
     }
 })
 
-router.put('/vote', async (req, res) => {
+router.put('/validate', async (req, res) => {
+
+    const {projectId, userId} = req.body;
+
+    try {
+
+        await Project.findByIdAndUpdate(projectId, {
+        studioValidated: userId, isValidatedByStaff: true, dateOfValidation : new Date(),
+    });
+
+    await User.findByIdAndUpdate(userId, {
+        $push: {'studio.developedProjects': projectId 
+        }
+    }, {new: true});
+
+    res.json({result: true});
+
+    } catch (error) {
+        res.status(400).json({result: false, error})
+    }
+
 
 
 })
