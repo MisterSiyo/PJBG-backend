@@ -231,6 +231,75 @@ router.post('/', async (req, res) => {
     }
 });
 
+// project.studiosPrevote
+// Route pour qu'un patron qui a financé (et/ou crée) un projet puisse voter pour un studio ayant postulé à ce projet (1 vote par projet par patron)
+router.post('/vote', async (req, res) => {
+    try {
+        // Récupération des données du corps de la requête
+        const { token, projectId, studioId } = req.body;
+
+        // Vérification de l'utilisateur via le token
+        const user = await User.findOne({ token });
+        if (!user) {
+            return res.json({ result: false, message: 'Utilisateur User not found' });
+        }
+
+        // Vérification que l'utilisateur est un patron
+        if (user.role !== 'patron') {
+            return res.json({ result: false, message: 'Only patrons can vote' });
+        }
+
+        // Récupération du projet
+        const project = await Project.findById(projectId);
+        if (!project) {
+            return res.json({ result: false, message: 'Project not found' });
+        }
+
+        // Vérification si l'utilisateur a financé ou créé le projet
+        const hasFunded = project.progressions.some(progress => progress.userContributing.toString() === user._id.toString());
+        const hasCreated = project.user.toString() === user._id.toString();
+
+        if (!hasFunded && !hasCreated) {
+            return res.json({ result: false, message: 'You can only vote if you funded or created this project' });
+        }
+
+        // Vérification si le studio existe dans les studios intéressés
+        const studioPreVote = project.studiosPreVote.find(studio => studio.studio.toString() === studioId);
+        if (!studioPreVote) {
+            return res.json({ result: false, message: 'Studio not found in interested studios' });
+        }
+
+        // Vérification si l'utilisateur a déjà voté pour ce projet
+        const existingVote = studioPreVote.votes.includes(user._id);
+        if (existingVote) {
+            return res.json({ result: false, message: 'You have already voted' });
+        }
+
+        // Ajout du vote
+        studioPreVote.votes.push(user._id);
+
+        // Sauvegarde du projet mis à jour
+        await project.save();
+
+        // Ajout d'un message dans l'historique du projet
+        project.histories.push({
+            userPosting: user._id,
+            message: `${user.username} voted for the studio ${user.studio.companyName}`,
+            date: new Date()
+        });
+
+        await project.save();
+
+        return res.json({ result: true, message: `You voted for the studio${studioId}` });
+    } catch (error) {
+        console.error(error);
+        return res.json({ result: false, message: 'Error processing request' });
+    }
+});
+
+
+
+
 // les routes ci-dessous sont en cours de création, ne pas toucher svp !!!!
 
 // route qui permet à un user de contribuer financièrement à un projet
