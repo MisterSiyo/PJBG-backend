@@ -64,6 +64,12 @@ const stageSchema = mongoose.Schema({
    },
    { timestamps: true }
 );
+// project.studiosPreVote =>
+const studioPreVoteSchema = mongoose.Schema({
+    studio: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
+    votes : [{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
+    winner: {type: Boolean, default : false}
+})
 
 // la collection ci-dessous
 
@@ -79,7 +85,7 @@ const projectSchema = new mongoose.Schema(
             required: [true, 'url required']
         },
         imageURL: {
-            type: String,
+            type: [String],
             required: false,
             default: '', // !!! définir une image bidon en default
             validator : function(d) {
@@ -144,7 +150,7 @@ const projectSchema = new mongoose.Schema(
         },
 
         // la liste de tous les studios ayant souhaité prendre en main le projet
-        studiosPreVote: [{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
+        studiosPreVote: [studioPreVoteSchema],
         studioValidated: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
 
         // le user ayant créé le projet

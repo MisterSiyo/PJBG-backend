@@ -108,7 +108,7 @@ router.get('/:query', async (req, res) => {
             select: 'username role'
         })
         .populate({
-            path: 'studiosPreVote',
+            path: 'studiosPreVote.studio',
             model: 'users',
             select: 'studio.companyName studio.description'
         })
@@ -230,6 +230,87 @@ router.post('/', async (req, res) => {
     }
 });
 
+// project.studiosPrevote
+// Route pour qu'un patron qui a financé (et/ou crée) un projet puisse voter pour un studio ayant postulé à ce projet (1 vote par projet par patron)
+router.post('/vote', async (req, res) => {
+    try {
+        // Récupération des données du corps de la requête
+        const { token, projectId, studioId } = req.body;
+
+        // Vérification de l'utilisateur via le token
+        const user = await User.findOne({ token });
+        if (!user) {
+            return res.json({ result: false, message: 'User not found' });
+        }
+
+        // Vérification que l'utilisateur est un patron
+        if (user.role !== 'patron') {
+            return res.json({ result: false, message: 'Only patrons can vote' });
+        }
+
+        // Récupération du projet
+        const project = await Project.findById(projectId);
+        if (!project) {
+            return res.json({ result: false, message: 'Project not found' });
+        }
+
+        // Vérification si l'utilisateur a financé ou créé le projet
+        const hasFunded = project.progressions.some(progress => 
+            progress.userContributing && progress.userContributing.toString() === user._id.toString()
+        );
+        const hasCreated = project.user.toString() === user._id.toString();
+
+        if (!hasFunded && !hasCreated) {
+            return res.json({ result: false, message: 'You can only vote if you funded or created this project' });
+        }
+
+        // Vérification si le studio existe dans les studios intéressés
+        const studioIndex = project.studiosPreVote.findIndex(studio => 
+            studio.studio && studio.studio.toString() === studioId
+        );
+        
+        if (studioIndex === -1) {
+            return res.json({ result: false, message: 'Studio not found in interested studios' });
+        }
+
+        // Récupérer les informations du studio
+        const studioObj = await User.findById(studioId).select('studio.companyName');
+        if (!studioObj) {
+            return res.json({ result: false, message: 'Studio information not found' });
+        }
+
+        // Vérification si l'utilisateur a déjà voté pour ce projet
+        const existingVote = project.studiosPreVote[studioIndex].votes.some(
+            voteId => voteId && voteId.toString() === user._id.toString()
+        );
+        
+        if (existingVote) {
+            return res.json({ result: false, message: 'You have already voted for this studio' });
+        }
+
+        // Ajout du vote
+        project.studiosPreVote[studioIndex].votes.push(user._id);
+
+        // Ajout d'un message dans l'historique du projet
+        project.histories.push({
+            historyType: 'vote',
+            userPosting: user._id,
+            message: `${user.username} voted for the studio ${studioObj.studio ? studioObj.studio.companyName : 'Unknown'}`,
+            date: new Date()
+        });
+
+        await project.save();
+
+        return res.json({ result: true, message: `You voted for the studio successfully!` });
+    } catch (error) {
+        console.error(error);
+        return res.json({ result: false, message: 'Error processing request', error: error.message });
+    }
+});
+
+
+
+
 // les routes ci-dessous sont en cours de création, ne pas toucher svp !!!!
 
 // route qui permet à un user de contribuer financièrement à un projet
@@ -305,8 +386,18 @@ router.put('/dev', async (req, res) => {
             return res.json({result: false, message: 'authorization denied'})
         }
 
+        const isAlreadyDev = await Project.findOne({_id: projectId, "studiosPreVote.studio": user._id})
+        
+        if (isAlreadyDev) {
+            res.json({result: false, message: 'you already develop this project'})
+        }
+
         const projectUpdated = await Project.findByIdAndUpdate(projectId, { isChosen: true,
-            $push: { studiosPreVote: user._id
+            $push: { studiosPreVote: {
+                studio: user._id,
+                votes: [],
+                winner: false,
+            }
         }})
 
         await User.findOneAndUpdate({token}, {
@@ -340,7 +431,7 @@ router.put('/validate', async (req, res) => {
     try {
 
         await Project.findByIdAndUpdate(projectId, {
-        studioValidated: userId, isValidatedByStaff: true, dateOfValidation : new Date(),
+        studioValidated: userId, isValidatedByStaff: true, dateOfValidation : new Date(), isVisible: false,
     });
 
     await User.findByIdAndUpdate(userId, {
