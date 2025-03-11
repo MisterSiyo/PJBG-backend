@@ -241,7 +241,7 @@ router.post('/vote', async (req, res) => {
         // Vérification de l'utilisateur via le token
         const user = await User.findOne({ token });
         if (!user) {
-            return res.json({ result: false, message: 'Utilisateur User not found' });
+            return res.json({ result: false, message: 'User not found' });
         }
 
         // Vérification que l'utilisateur est un patron
@@ -256,7 +256,9 @@ router.post('/vote', async (req, res) => {
         }
 
         // Vérification si l'utilisateur a financé ou créé le projet
-        const hasFunded = project.progressions.some(progress => progress.userContributing.toString() === user._id.toString());
+        const hasFunded = project.progressions.some(progress => 
+            progress.userContributing && progress.userContributing.toString() === user._id.toString()
+        );
         const hasCreated = project.user.toString() === user._id.toString();
 
         if (!hasFunded && !hasCreated) {
@@ -264,36 +266,46 @@ router.post('/vote', async (req, res) => {
         }
 
         // Vérification si le studio existe dans les studios intéressés
-        const studioPreVote = project.studiosPreVote.find(studio => studio.studio.toString() === studioId);
-        if (!studioPreVote) {
+        const studioIndex = project.studiosPreVote.findIndex(studio => 
+            studio.studio && studio.studio.toString() === studioId
+        );
+        
+        if (studioIndex === -1) {
             return res.json({ result: false, message: 'Studio not found in interested studios' });
         }
 
+        // Récupérer les informations du studio
+        const studioObj = await User.findById(studioId).select('studio.companyName');
+        if (!studioObj) {
+            return res.json({ result: false, message: 'Studio information not found' });
+        }
+
         // Vérification si l'utilisateur a déjà voté pour ce projet
-        const existingVote = studioPreVote.votes.includes(user._id);
+        const existingVote = project.studiosPreVote[studioIndex].votes.some(
+            voteId => voteId && voteId.toString() === user._id.toString()
+        );
+        
         if (existingVote) {
-            return res.json({ result: false, message: 'You have already voted' });
+            return res.json({ result: false, message: 'You have already voted for this studio' });
         }
 
         // Ajout du vote
-        studioPreVote.votes.push(user._id);
-
-        // Sauvegarde du projet mis à jour
-        await project.save();
+        project.studiosPreVote[studioIndex].votes.push(user._id);
 
         // Ajout d'un message dans l'historique du projet
         project.histories.push({
+            historyType: 'vote',
             userPosting: user._id,
-            message: `${user.username} voted for the studio ${user.studio.companyName}`,
+            message: `${user.username} voted for the studio ${studioObj.studio ? studioObj.studio.companyName : 'Unknown'}`,
             date: new Date()
         });
 
         await project.save();
 
-        return res.json({ result: true, message: `You voted for the studio${studioId}` });
+        return res.json({ result: true, message: `You voted for the studio successfully!` });
     } catch (error) {
         console.error(error);
-        return res.json({ result: false, message: 'Error processing request' });
+        return res.json({ result: false, message: 'Error processing request', error: error.message });
     }
 });
 
