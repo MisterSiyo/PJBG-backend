@@ -271,7 +271,7 @@ router.post('/vote', async (req, res) => {
 
         // Vérification si le studio existe dans les studios intéressés
         const studioIndex = project.studiosPreVote.findIndex(studio => 
-            studio.studio && studio.studio.toString() === studioId
+             studio.studio?.toString() === studioId
         );
         
         if (studioIndex === -1) {
@@ -284,17 +284,47 @@ router.post('/vote', async (req, res) => {
             return res.json({ result: false, message: 'Studio information not found' });
         }
 
-        // Vérification si l'utilisateur a déjà voté pour ce projet
-        const existingVote = project.studiosPreVote[studioIndex].votes.some(
-            voteId => voteId && voteId.toString() === user._id.toString()
-        );
-        
-        if (existingVote) {
+        let hasVoted = false;
+
+        for (let i=0; i< project.studiosPreVote.length; i++) {
+            project.studiosPreVote[i].votes.includes(user._id) ? hasVoted = true : null
+        }
+
+        // const existVote = project.studiosPreVote.map(studio => studio.votes.filter(vote => vote == user._id))
+        const existVoteForSameStudio = project.studiosPreVote[studioIndex].votes.some(voteId => voteId && voteId.toString() === user._id.toString())
+
+        if (existVoteForSameStudio) {
             return res.json({ result: false, message: 'You have already voted for this studio' });
         }
 
-        // Ajout du vote
-        project.studiosPreVote[studioIndex].votes.push(user._id);
+        if (hasVoted) {
+    
+            const previousVoteIndex = project.studiosPreVote.findIndex(studio => 
+                studio.votes.includes(user._id)
+            );
+       
+            const updatedProject = await Project.findByIdAndUpdate(
+                projectId,
+                {
+                    $pull: { [`studiosPreVote.${previousVoteIndex}.votes`]: user._id },
+                    $push: { [`studiosPreVote.${studioIndex}.votes`]: user._id }
+                }
+            );
+        
+            if (!updatedProject) {
+                return res.json({ result: false, message: 'Failed to update votes' });
+            }
+            
+            // return res.json({result: true})
+        } else {
+    
+            await Project.findByIdAndUpdate(
+                projectId,
+                { $push: { [`studiosPreVote.${studioIndex}.votes`]: user._id } }
+            );
+            // return res.json({result: true})
+            
+        }
 
         // Ajout d'un message dans l'historique du projet
         project.histories.push({
