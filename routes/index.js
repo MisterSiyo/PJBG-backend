@@ -13,18 +13,11 @@ router.get('/', function(req, res, next) {
   res.json({ message: 'Bienvenue sur la page d\'accueil de l\'API' });
 });
 
-/* GET home page. 
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});*/
-
+// route pour récupérer toutes les gameMechanics et les pledges pour le composant Game Creation
 router.get('/characteristics', async (req, res) => {
   try {
     const gameMechanics = await GameMechanic.find({});
     const pledges = await Pledge.find({});
-
-    console.log('Game Mechanics:', gameMechanics);
-    console.log('Pledges:', pledges);
 
     if (gameMechanics.length == 0 || pledges.length == 0) {
       return res.json({ result: false, message: "no data to Show, please insert a coin" });
@@ -37,6 +30,7 @@ router.get('/characteristics', async (req, res) => {
   }
 });
 
+// route pour récupérer toutes les gameMechanics de type "genre" de jeu vidéo
 router.get('/genres', async (req, res) => {
 
   try {

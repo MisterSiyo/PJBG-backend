@@ -1,7 +1,7 @@
 const express = require('express'); // Importation de la librairie Express pour la gestion des routes HTTP
 const router = express.Router(); // Création d'un routeur Express pour définir les routes
 const User = require('../models/users'); // Importation du modèle "User" pour interagir avec la base de données (MongoDB)
-const authenticate = require('../middlewares/authenticate'); // Middleware d'authentification pour vérifier les utilisateurs
+const authenticate = require('../middlewares/authenticate'); // Middleware d'authentification pour vérifier les utilisateurs PLUS UTILISE
 const bcrypt = require('bcrypt');
 
 
@@ -29,7 +29,6 @@ router.get('/', async(req, res) => {  // Route GET pour récupérer les informat
 
 router.put('/', (req, res) => {  // Route PUT pour mettre à jour les informations d'un utilisateur
 
-    console.log(req.body)
     const { token, email, phone, name, surname, description, address, studio, socialLinks, userFavorites, fundedProjects, followedProjects, createdProjects } = req.body;  // Déstructuration des champs reçus dans la requête
 
     // Met à jour les informations de l'utilisateur en fonction du token

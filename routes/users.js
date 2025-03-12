@@ -68,7 +68,7 @@ router.get("/siret/:siret", async (req, res) => {
 
 // Route pour la création d'un compte utilisateur
 router.post("/register", async (req, res) => {
-  // console.log("Received body:", req.body);
+
   const { username, email, password, role, companyInfo } = req.body;
 
   if (role !== "patron" && role !== "studio") {
@@ -122,7 +122,7 @@ router.post("/register", async (req, res) => {
       },
     };
 
-    console.log("fun check");
+
     if (role === "studio" && companyInfo) {
       const formattedCompany = companyInfo.address
         ? companyInfo
@@ -207,71 +207,40 @@ router.post("/login", async (req, res) => {
     }
 
     if (user.fundedProjects.length > 0) {
-      console.log("funded if");
+
       await user.populate({
         path: "fundedProjects.project",
         model: "projects",
       })
-
-      // .populate({path: 'fundedProjects.project.progressions.pledgeChosen',
-      //   model: 'Pledges'
-      // }).populate({path: 'fundedProjects.project.detail.gameMechanics',
-      //   model: 'gameMechanics'
-      // })
-      // ;
     }
 
     if (user.followedProjects.length > 0) {
-      console.log("followed if");
+
       await user.populate({
         path: "followedProjects",
         model: "projects",
       })
-      // .populate({path: 'followedProjects.progressions.pledgeChosen',
-      //   model: 'Pledges'
-      // }).populate({path: 'followedProjects.detail.gameMechanics',
-      //   model: 'gameMechanics'
-      // })
-      ;
     }
 
     if (user.createdProjects.length > 0) {
-      console.log("created if");
+
       await user.populate({
         path: "createdProjects",
         model: "projects",
       })
-      // .populate({path: 'createdProjects.progressions.pledgeChosen',
-      //   model: 'Pledges'
-      // }).populate({path: 'createdProjects.detail.gameMechanics',
-      //   model: 'gameMechanics'
-      // })
-      ;
     }
 
     if (user.studio?.chosenProjects.length > 0) {
       await user.populate({
         path: 'studio.chosenProjects', 
         model: 'projects'})
-        // .populate({path: 'studio.chosenProjects.progressions.pledgeChosen',
-        //   model: 'Pledges'
-        // }).populate({path: 'studio.chosenProjects.detail.gameMechanics',
-        //   model: 'gameMechanics'
-        // })
     }
 
     if (user.studio?.developedProjects.length > 0) {
       await user.populate({
         path: 'studio.developedProjects', 
         model: 'projects'})
-        // .populate({path: 'studio.developedProjects.progressions.pledgeChosen',
-        //   model: 'Pledges'
-        // }).populate({path: 'studio.developedProjects.detail.gameMechanics',
-        //   model: 'gameMechanics'
-        // })
     }
-
-
 
     res.status(200).json({
       message: "Connection successful",
@@ -448,7 +417,7 @@ router.post("/google-auth", async (req, res) => {
         authType: "google",
       });
       await user.save();
-      console.log("Nouvel utilisateur Google créé:", email);
+
     } else {
       // Mettre à jour les informations de l'utilisateur existant
       user.email = email;
@@ -458,7 +427,7 @@ router.post("/google-auth", async (req, res) => {
       user.picture = picture || user.picture;
 
       await user.save();
-      console.log("Utilisateur Google existant mis à jour:", email);
+
     }
 
     // Générer un token JWT
@@ -470,7 +439,6 @@ router.post("/google-auth", async (req, res) => {
 
     // Renvoyer les informations utilisateur et le token
     res.status(200).json({
-      // !!!!                                    A CORRRIGER CECI N EST PAS CONFORME PROTECTION ET RENVOIT AUSSI UNE ERREUR FORCEMENT
       message:
         user.createdAt === user.updatedAt
           ? "Utilisateur créé"
@@ -545,7 +513,6 @@ router.post("/reddit-auth", async (req, res) => {
 
     // Retourner les informations utilisateur et le token
     return res.status(200).json({
-      // !!!!                                    A CORRRIGER CECI N EST PAS CONFORME PROTECTION ET RENVOIT AUSSI UNE ERREUR FORCEMENT
       success: true,
       user: {
         id: user._id,
@@ -592,7 +559,6 @@ router.get("/me", async (req, res) => {
 
     // Renvoyer les informations utilisateur
     return res.status(200).json({
-      // !!!!                                    A CORRRIGER CECI N EST PAS CONFORME PROTECTION ET RENVOIT AUSSI UNE ERREUR FORCEMENT
       success: true,
       user: {
         id: user._id,
@@ -661,19 +627,6 @@ router.post("/toggleFollow", async (req, res) => {
       return res.status(200).json({success: true, message: "projet ajouté aux favoris", followedProjects: user.followedProjects})
     }
 
-    // // Sauvegarder les modifications
-    // await user.save();
-
-    // // Répondre avec la liste mise à jour des projets suivis
-    // return res.status(200).json({
-    //   success: true,
-    //   message:
-    //     projectIndex > -1
-    //       ? "Projet retiré des favoris"
-    //       : "Projet ajouté aux favoris",
-    //   followedProjects: user.followedProjects,
-    //   newproject: project
-    // });
   } catch (error) {
     console.error("Erreur lors de la mise à jour des projets suivis:", error);
     return res.status(500).json({
@@ -683,6 +636,7 @@ router.post("/toggleFollow", async (req, res) => {
   }
 });
 
+// route qui permettait de recharger redux avec le contenu de la BDD -- PLUS UTILISE
 router.post('/reduxrender', async (req, res) => {
 
   const {token} = req.body;
@@ -696,7 +650,5 @@ try {
 }
 
 })
-
-
 
 module.exports = router;

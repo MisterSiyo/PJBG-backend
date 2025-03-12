@@ -1,18 +1,10 @@
 const mongoose = require('mongoose');
 
-const gameMechanicSchema = new mongoose.Schema( // les champs en commentaires sont des prospects pour plus tard, les laisser en commentaires pour le projet
+const gameMechanicSchema = new mongoose.Schema( // le schéma des mécaniques de jeu que nous proposons (309 documents) pour assister le créateur d'un projet de jeu vidéo
     {
         name: {
             type: String,
         },
-        // imageURL: {
-        //     type: String,
-        //     default: '', // !!! définir une image bidon en default
-        //     validator : function(d) {
-        //         return  /http\:\/\/.+/.test(d);
-        //     },
-        //     message: props => `${props.value} n'est pas une URL valide`
-        // },
         description: {
             type: String,
         },

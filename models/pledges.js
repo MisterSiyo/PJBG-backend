@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const pledgeSchema = new mongoose.Schema( // les champs en commentaires sont des prospects pour plus tard, les laisser en commentaires pour le projet
+const pledgeSchema = new mongoose.Schema( // le schéma des différentes contributions que nous proposons, le créateur d'un projet pourra choisir sur chaque niveau de contribution celui qu'il souhaite voir proposer pour les financeurs
     {
         pledgeId: {
             type: Number,
@@ -11,22 +11,10 @@ const pledgeSchema = new mongoose.Schema( // les champs en commentaires sont des
             type: Number,
             required: [true, 'level required'],
         },
-        // rewardType: {
-        //     type: String,
-        //     required: [true, 'type is required']
-        // },
         rewards: {
             type: [String],
             required: true,
         },
-        // imageURL: {
-        //     type: String,
-        //     default: '', // !!! définir une image bidon en default
-        //     validator : function(d) {
-        //         return  /http\:\/\/.+/.test(d);
-        //     },
-        //     message: props => `${props.value} n'est pas une URL valide`
-        // },
     }
 );
 

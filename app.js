@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken"); // Ajouter jwt pour la vérification du tok
 const app = express();
 pjbgDB();
 
-// Middleware pour vérifier l'authentification par token
+// Middleware pour vérifier l'authentification par token PLUS UTILISE
 const verifyToken = (req, res, next) => {
   const token = req.cookies.token || req.headers["authorization"]; // Vérifier si un token est présent dans les cookies ou les en-têtes
   if (!token) {

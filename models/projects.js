@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
-// les quatres sous documents que constituent chaque document 
+// les cinq sous documents que constituent chaque document
 // de la collection Projects :
-//  (detail, history, progression, stage)
+//  (detail, history, progression, stage, studioPreVote)
 
 // détaille le projet avec la description, les mécaniques de jeu et les pledges
 const detailSchema = mongoose.Schema({
@@ -14,7 +14,6 @@ const detailSchema = mongoose.Schema({
     pledges: [{type: mongoose.Schema.Types.ObjectId, ref: 'pledges'}],
    });
 
-// !!! attention, ci-dessous il faudra peut être passer en mode Pusher ?!
 // gère le 'chat/forum' entre backers et un feed news (automatisé par script, posté par le compte du staff)
 const historySchema = mongoose.Schema({
     historyType: String,
@@ -31,6 +30,8 @@ const progressionSchema = mongoose.Schema({
     isPledgePayed: Boolean,
    });
 
+
+   // -----------------  sous-document du sous-document Stage, gère chaque update faite par un studio
    const updateSchema = mongoose.Schema({
     category: String, 
     contentUpdate: String },
@@ -53,7 +54,7 @@ const stageSchema = mongoose.Schema({
         type: String,
     }, 
     closingNotes: String, 
-    imagesURL: [{
+    imagesURL: [{ //  -------------------------- feature prévue pour plus tard
         type: String,
         default: '', // !!! définir une image bidon en default
         validator : function(d) {
@@ -64,7 +65,7 @@ const stageSchema = mongoose.Schema({
    },
    { timestamps: true }
 );
-// project.studiosPreVote =>
+// project.studiosPreVote
 const studioPreVoteSchema = mongoose.Schema({
     studio: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
     votes : [{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
@@ -108,7 +109,7 @@ const projectSchema = new mongoose.Schema(
         goal: {
             type: Number,
             default: 123456789, // !!! a voir ensemble si on en met une, et laquelle
-            required: false, // !!! a voir ensemble
+            required: false,
         },
 
         // Booléens de typage pour le front (affichage, fonctionnalités possibles...)
@@ -151,7 +152,7 @@ const projectSchema = new mongoose.Schema(
 
         // la liste de tous les studios ayant souhaité prendre en main le projet
         studiosPreVote: [studioPreVoteSchema],
-        studioValidated: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
+        studioValidated: {type: mongoose.Schema.Types.ObjectId, ref: 'users'}, // le studio qui sera validé par les votes des backeurs et le staff
 
         // le user ayant créé le projet
         user: {type: mongoose.Schema.Types.ObjectId, ref: 'users'}

@@ -4,7 +4,7 @@ const Project = require('../models/projects');
 const User = require('../models/users');
 const Pledge = require('../models/pledges');
 
-
+// route pour ajouter une update à la roadmap studio du développement d'un projet (update par mois)
 router.post('/update/:id', async (req, res) => {
     // On récupère "token" (et plus "userAccount") pour éviter la confusion
     const { title, update, monthUpdate, roadmapUpdate, closingNotes, token } = req.body;
@@ -171,6 +171,10 @@ router.get('/:query', async (req, res) => {
     }
 });
 
+// route qui récupère par ID toutes les données d'un projet (utilisée par les project Cards surtout 
+// car dans le store redux on ne garde que les ID des projets, pas leurs datas complètes)
+// ça nous permet de limiter le dataflow de ce qu'on garde en store. Car il faut éviter trop d'appels à notre back
+// mais aussi limiter la data transportée et rechargée à chaque construction de composant.
 router.get('/byId/:projectId', async (req, res) => {
     const projectId = req.params.projectId;
 
@@ -324,8 +328,9 @@ router.post('/', async (req, res) => {
     }
 });
 
-// project.studiosPrevote
+
 // Route pour qu'un patron qui a financé (et/ou crée) un projet puisse voter pour un studio ayant postulé à ce projet (1 vote par projet par patron)
+// le vote est dynamique et peut se faire changer à l'envie.
 router.post('/vote', async (req, res) => {
     try {
         // Récupération des données du corps de la requête
@@ -433,10 +438,6 @@ router.post('/vote', async (req, res) => {
 });
 
 
-
-
-// les routes ci-dessous sont en cours de création, ne pas toucher svp !!!!
-
 // route qui permet à un user de contribuer financièrement à un projet
 router.put('/backing', async (req, res) => {
 
@@ -469,12 +470,11 @@ router.put('/backing', async (req, res) => {
 })
 
 // route qui permet de poster un message dans le chat du projet
-
 router.post('/messages/:query', async (req, res) => {
 
     const pageURL = req.params.query;
     const {token, message} = req.body;
-    // console.log( 'voici mes datas : ', pageURL, token, message)
+
     try {
         const projectId = (await Project.findOne({pageURL}))._id;
         const userPosting = (await User.findOne({token}))._id;
@@ -500,6 +500,7 @@ router.post('/messages/:query', async (req, res) => {
     }
 })
 
+// route qui permet à un studio de postuler sur un projet, rentrant dans la liste des studiosPreVotes de la collection Project
 router.put('/dev', async (req, res) => {
 
     const {projectId, token} = req.body;
@@ -550,6 +551,8 @@ router.put('/dev', async (req, res) => {
     }
 })
 
+// route exclusive au backend, utilisée seulement par le biais de thunderclient pour valider un projet et le passer en mode 'ProjectValidated'
+// ce qui correspond à un projet en développement
 router.put('/validate', async (req, res) => {
 
     const {projectId, userId} = req.body;
@@ -570,9 +573,6 @@ router.put('/validate', async (req, res) => {
     } catch (error) {
         res.status(400).json({result: false, error})
     }
-
-
-
 })
 
 module.exports = router;
