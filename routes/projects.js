@@ -171,6 +171,95 @@ router.get('/:query', async (req, res) => {
     }
 });
 
+router.get('/byId/:projectId', async (req, res) => {
+    const projectId = req.params.projectId;
+
+    try {
+        const project = await Project.findById(projectId)
+        .select('-__v')
+        .populate({
+            path:'user',
+            select: 'username description role followedProjects fundedProjects -_id'
+        })
+        .populate({
+            path: 'detail.pledges', 
+            model: 'Pledges',
+            select: '-_id'
+        })
+        .populate({
+            path: 'detail.gameMechanics', 
+            model: 'gameMechanics',
+            select: '-_id'
+        })
+        .populate({
+            path: 'histories.userPosting',
+            select: 'username role'
+        })
+        .populate({
+            path: 'studiosPreVote.studio',
+            model: 'users',
+            select: 'studio.companyName studio.description'
+        })
+        .populate({
+            path: 'studiosPreVote.votes',
+            model: 'users',
+            select: 'username -_id'
+        })
+        .populate({
+            path: 'studioValidated',
+            model: 'users',
+            select: 'studio.companyName studio.description'
+        })
+        .populate({
+            path: 'progressions.userContributing',
+            model: 'users',
+            select: 'username -_id'
+        })
+        .populate({
+            path: 'progressions.pledgeChosen',
+            model: 'Pledges',
+        })
+        ;
+
+        if (!project) {
+
+            return res.status(404).json({result: false, message: "No Project Found"})
+        }
+
+        await project.populate({
+                path: 'user.fundedProjects.project',
+                model: 'projects',
+                select: 'title'
+        })
+
+        await project.populate({
+            path: 'user.followedProjects.project',
+            model: 'projects',
+            select: 'title'
+    })
+
+
+    let layoutType = "default";
+        if (project.isChosen && project.isValidatedByStaff) {
+            layoutType = "validated";
+        }
+
+        res.json({
+            result: true,
+            message: 'Here is your project page',
+            project: {
+                ...project.toObject(),
+                layoutType  // On ajoute ce champ au frontend
+            }
+        });
+
+    } catch (error) {
+        console.log(error)
+        res.status(403).json({result: false, message: 'no project of this name', error})
+    }
+});
+
+
 // route qui permet de créer un projet en base de données
 router.post('/', async (req, res) => { 
     try {
@@ -370,7 +459,9 @@ router.put('/backing', async (req, res) => {
                 pledgeChosen
             }}
         })
-        res.json({result: true, project, check})
+        const newChecks = (await User.findById(userContributing)).fundedProjects;
+
+        res.json({result: true, project, check, newChecks})
     }
     catch (error) {
         res.status(403).json({result : false, error})
