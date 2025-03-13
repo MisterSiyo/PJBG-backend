@@ -40,7 +40,7 @@ app.use(bodyParser.json()); // Middleware pour parser le body
 
 
 const corsOptions = {
-  origin: "http://localhost:3001",
+  origin: "https://pjbg-frontend.vercel.app",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
